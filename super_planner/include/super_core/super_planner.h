@@ -26,7 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include "Eigen/Eigen"
-
+#include <cmath>
 
 #include <super_core/config.hpp>
 #include <ros_interface/ros1/ros1_interface.hpp>
