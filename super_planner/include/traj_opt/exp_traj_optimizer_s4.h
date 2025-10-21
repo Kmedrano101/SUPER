@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <traj_opt/config.hpp>
-#include <traj_opt/minco.h>
+#include <utils/optimization/minco.h>
 
 
 #include <data_structure/base/polytope.h>
@@ -49,6 +49,18 @@ namespace traj_opt {
     using super_utils::VecDf;
     using super_utils::PolyhedraH;
     using super_utils::PolyhedraV;
+    using super_utils::vec_Vec3f;
+    using super_utils::StatePVAJ;
+    using super_utils::StatePVA;
+    using super_utils::Vec3f;
+    using super_utils::vec_E;
+
+    using namespace geometry_utils;
+
+    // Import MINCO classes from optimization_utils
+    using optimization_utils::MINCO_S2NU;
+    using optimization_utils::MINCO_S3NU;
+    using optimization_utils::MINCO_S4NU;
 
 
     class ExpTrajOpt {

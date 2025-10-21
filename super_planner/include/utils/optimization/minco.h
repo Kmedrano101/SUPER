@@ -94,6 +94,9 @@ namespace optimization_utils {
                            const Eigen::Matrix3d &tailState,
                            const int &pieceNum);
 
+        void setConditions(const Eigen::Matrix3d &headState,
+                           const Eigen::Matrix3d &tailState);
+
         void setEndPosition(const Eigen::Vector3d &end_p);
 
         void setParameters(const Eigen::Matrix3Xd &inPs,
@@ -114,6 +117,13 @@ namespace optimization_utils {
                            Eigen::Matrix3Xd &gradByPoints,
                            Eigen::VectorXd &gradByTimes,
                            bool free_end = false);
+
+        void propogateGradOfWayptsAndState(const Eigen::MatrixX3d &partialGradByCoeffs,
+                                           const Eigen::VectorXd &partialGradByTimes,
+                                           Eigen::VectorXd &gradByTimes,
+                                           StatePVA &gradByHeadState,
+                                           Mat3Df &gradByPoints,
+                                           StatePVA &gradByTailState);
     };
 
 // MINCO for s=4 and non-uniform time
@@ -142,6 +152,9 @@ namespace optimization_utils {
                            const Eigen::Matrix<double, 3, 4> &tailState,
                            const int &pieceNum);
 
+        void setConditions(const Eigen::Matrix<double, 3, 4> &headState,
+                           const Eigen::Matrix<double, 3, 4> &tailState);
+
         void setEndPosition(const Eigen::Vector3d &end_p);
 
         void setParameters(const Eigen::MatrixXd &inPs,
@@ -162,6 +175,13 @@ namespace optimization_utils {
                            Eigen::Matrix3Xd &gradByPoints,
                            Eigen::VectorXd &gradByTimes,
                            bool free_end = false);
+
+        void propogateGradOfWayptsAndState(const Eigen::MatrixX3d &partialGradByCoeffs,
+                                           const Eigen::VectorXd &partialGradByTimes,
+                                           Eigen::VectorXd &gradByTimes,
+                                           StatePVAJ &gradByHeadState,
+                                           Eigen::Matrix3Xd &gradByPoints,
+                                           StatePVAJ &gradByTailState);
     };
 
 }

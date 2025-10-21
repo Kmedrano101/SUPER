@@ -28,8 +28,6 @@ set(CMAKE_PREFIX_PATH ../../../install)
 include_directories(
         SYSTEM
         include
-        ../../../devel/include
-        ${catkin_INCLUDE_DIRS}
         ${Eigen3_INCLUDE_DIRS}
         ${PCL_INCLUDE_DIRS}
 )
@@ -38,15 +36,22 @@ include_directories(
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rog_map REQUIRED)
-find_package(mars_quadrotor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(PCL REQUIRED)
 find_package(pcl_conversions REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
+# Generate custom messages
+rosidl_generate_interfaces(${PROJECT_NAME}
+        "msg/PositionCommand.msg"
+        "msg/PolynomialTrajectory.msg"
+        DEPENDENCIES std_msgs geometry_msgs
+)
 
 set(includes
         include
@@ -65,16 +70,14 @@ set(third_party_libs
 set(ros_libs
         rclcpp
         std_msgs
-        mars_quadrotor_msgs
         sensor_msgs
+        geometry_msgs
         tf2_ros
         nav_msgs
-        geometry_msgs
         visualization_msgs
         rog_map
         tf2_ros
         pcl_conversions
-
 )
 
 include_directories(
@@ -93,10 +96,12 @@ target_include_directories(super PUBLIC
 ament_target_dependencies(super PUBLIC
         ${ros_libs}
 )
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_link_libraries(super PUBLIC "${cpp_typesupport_target}")
 
 #=================FOR Benchmark Node ============================#
 add_executable(fsm_node
-        Apps/fsm_node_ros2.cpp
+        Apps/fsm_node.cpp
 )
 target_link_libraries(fsm_node PUBLIC
         super
@@ -125,10 +130,11 @@ install(DIRECTORY include/
         DESTINATION include/
 )
 
-# install the launch file
+# install the launch file, config, and rviz
 install(DIRECTORY
         launch
         config
+        rviz
         DESTINATION share/${PROJECT_NAME}/
 )
 

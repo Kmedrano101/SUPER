@@ -26,7 +26,7 @@
 #ifndef SRC_ROS2_VISUALIZER_HPP
 #define SRC_ROS2_VISUALIZER_HPP
 
-#include "ros_interface/ros2/ros2_adapter.hpp"
+#include "ros_interface/ros/ros_adapter.hpp"
 
 
 namespace ros_interface {

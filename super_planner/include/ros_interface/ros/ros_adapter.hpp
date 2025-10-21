@@ -37,8 +37,8 @@
 #include "pcl/point_types.h"
 #include "pcl_conversions/pcl_conversions.h"
 #include <random>
-#include "mars_quadrotor_msgs/msg/position_command.hpp"
-#include "mars_quadrotor_msgs/msg/polynomial_trajectory.hpp"
+#include "super_planner/msg/position_command.hpp"
+#include "super_planner/msg/polynomial_trajectory.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "rosgraph_msgs/msg/clock.hpp"
 #include <cmath>
@@ -51,8 +51,8 @@ namespace ros_interface {
     using MarkerPubPtr = rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr;
     using PointCloud2PubPtr = rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr;
     using PathPubPtr = rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr;
-    using PositionCommandPubPtr = rclcpp::Publisher<mars_quadrotor_msgs::msg::PositionCommand>::SharedPtr;
-    using PolynomialTrajectoryPubPtr = rclcpp::Publisher<mars_quadrotor_msgs::msg::PolynomialTrajectory>::SharedPtr;
+    using PositionCommandPubPtr = rclcpp::Publisher<super_planner::msg::PositionCommand>::SharedPtr;
+    using PolynomialTrajectoryPubPtr = rclcpp::Publisher<super_planner::msg::PolynomialTrajectory>::SharedPtr;
 
     const std::string DEFAULT_FRAME_ID = "world";
 

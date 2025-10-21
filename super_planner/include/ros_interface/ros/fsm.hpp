@@ -31,32 +31,32 @@
 #include "fsm/fsm.h"
 
 #include <rclcpp/rclcpp.hpp>
-#include <ros_interface/ros2/ros2_interface.hpp>
+#include <ros_interface/ros/ros_interface.hpp>
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "nav_msgs/msg/odometry.hpp"
-#include "mars_quadrotor_msgs/msg/position_command.hpp"
-#include "mars_quadrotor_msgs/msg/polynomial_trajectory.hpp"
+#include "super_planner/msg/position_command.hpp"
+#include "super_planner/msg/polynomial_trajectory.hpp"
 
 
 namespace fsm {
     class FsmRos2 : public Fsm {
 
         rclcpp::Node::SharedPtr nh_;
-        rclcpp::Publisher<mars_quadrotor_msgs::msg::PositionCommand>::SharedPtr cmd_pub_;
-        rclcpp::Publisher<mars_quadrotor_msgs::msg::PolynomialTrajectory>::SharedPtr mpc_cmd_pub_;
+        rclcpp::Publisher<super_planner::msg::PositionCommand>::SharedPtr cmd_pub_;
+        rclcpp::Publisher<super_planner::msg::PolynomialTrajectory>::SharedPtr mpc_cmd_pub_;
         rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
 
         rclcpp::TimerBase::SharedPtr execution_timer_, replan_timer_, cmd_timer_;
         rclcpp::CallbackGroup::SharedPtr exec_cbk_group_, replan_cbk_group_, cmd_cbk_group_, goal_cbk_group_;
 
-        mars_quadrotor_msgs::msg::PositionCommand pid_cmd_;
+        super_planner::msg::PositionCommand pid_cmd_;
         rog_map::ROGMapROS::Ptr map_ptr_;
-        mars_quadrotor_msgs::msg::PositionCommand latest_cmd;
+        super_planner::msg::PositionCommand latest_cmd;
         nav_msgs::msg::Path path;
 
-        vector<mars_quadrotor_msgs::msg::PositionCommand> cmd_logs_;
+        vector<super_planner::msg::PositionCommand> cmd_logs_;
 
         void resetVisualizedPath() override {
             path.poses.clear();
@@ -79,13 +79,13 @@ namespace fsm {
         }
 
         void publishPolyTraj() override {
-            mars_quadrotor_msgs::msg::PolynomialTrajectory cmd_traj;
+            super_planner::msg::PolynomialTrajectory cmd_traj;
             getCommittedTrajectory(cmd_traj);
             mpc_cmd_pub_->publish(cmd_traj);
         }
 
-        void getOneHeartBeatMsg(mars_quadrotor_msgs::msg::PolynomialTrajectory &heartbeat, bool &traj_finish) {
-            heartbeat.type = mars_quadrotor_msgs::msg::PolynomialTrajectory::HEART_BEAT;
+        void getOneHeartBeatMsg(super_planner::msg::PolynomialTrajectory &heartbeat, bool &traj_finish) {
+            heartbeat.type = super_planner::msg::PolynomialTrajectory::HEART_BEAT;
             ros_ptr_->getSimTime(heartbeat.header.stamp.sec, heartbeat.header.stamp.nanosec);
             heartbeat.header.frame_id = "world";
             double swt;
@@ -93,11 +93,11 @@ namespace fsm {
             heartbeat.start_wt_pos = swt;
         }
 
-        void getCommittedTrajectory(mars_quadrotor_msgs::msg::PolynomialTrajectory &cmd_traj) {
+        void getCommittedTrajectory(super_planner::msg::PolynomialTrajectory &cmd_traj) {
             ros_ptr_->getSimTime(cmd_traj.header.stamp.sec, cmd_traj.header.stamp.nanosec);
             cmd_traj.header.frame_id = "world";
-            cmd_traj.type = mars_quadrotor_msgs::msg::PolynomialTrajectory::POSITION_TRAJ |
-                            mars_quadrotor_msgs::msg::PolynomialTrajectory::HEART_BEAT;
+            cmd_traj.type = super_planner::msg::PolynomialTrajectory::POSITION_TRAJ |
+                            super_planner::msg::PolynomialTrajectory::HEART_BEAT;
             planner_ptr_->lockCommittedTraj();
             const Trajectory pos_traj = planner_ptr_->getCommittedPositionTrajectory();
             const Trajectory yaw_traj = planner_ptr_->getCommittedYawTrajectory();
@@ -115,7 +115,7 @@ namespace fsm {
 
             if (!yaw_traj.empty()) {
                 cmd_traj.type = cmd_traj.type |
-                                mars_quadrotor_msgs::msg::PolynomialTrajectory::YAW_TRAJ;
+                                super_planner::msg::PolynomialTrajectory::YAW_TRAJ;
                 cmd_traj.piece_num_yaw = yaw_traj.getPieceNum();
                 cmd_traj.order_yaw = 7;
                 double col_size = cmd_traj.order_yaw + 1;
@@ -138,7 +138,7 @@ namespace fsm {
             }
         }
 
-        void getOnePositionCommand(mars_quadrotor_msgs::msg::PositionCommand &pos_cmd, bool &traj_finish) {
+        void getOnePositionCommand(super_planner::msg::PositionCommand &pos_cmd, bool &traj_finish) {
             pos_cmd.trajectory_flag = 0;
             StatePVAJ pvaj;
             double yaw, yaw_dot;
@@ -295,8 +295,8 @@ namespace fsm {
             // 初始化Planner
             ros_ptr_ = std::make_shared<ros_interface::Ros2Interface>(nh_);
             planner_ptr_ = std::make_shared<SuperPlanner>(cfg_path, ros_ptr_, map_ptr_);
-            cmd_pub_ = nh_->create_publisher<mars_quadrotor_msgs::msg::PositionCommand>(cfg_.cmd_topic, qos);
-            mpc_cmd_pub_ = nh_->create_publisher<mars_quadrotor_msgs::msg::PolynomialTrajectory>(cfg_.mpc_cmd_topic,
+            cmd_pub_ = nh_->create_publisher<super_planner::msg::PositionCommand>(cfg_.cmd_topic, qos);
+            mpc_cmd_pub_ = nh_->create_publisher<super_planner::msg::PolynomialTrajectory>(cfg_.mpc_cmd_topic,
                                                                                                  qos);
             path_pub_ = nh_->create_publisher<nav_msgs::msg::Path>("fsm/path", qos);
 
@@ -373,7 +373,7 @@ namespace fsm {
             }
 
 
-            mars_quadrotor_msgs::msg::PolynomialTrajectory heartbeat;
+            super_planner::msg::PolynomialTrajectory heartbeat;
             getOneHeartBeatMsg(heartbeat, traj_finish_);
             getOnePositionCommand(pid_cmd_, traj_finish_);
             mpc_cmd_pub_->publish(heartbeat);

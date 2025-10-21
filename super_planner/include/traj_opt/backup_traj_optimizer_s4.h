@@ -26,7 +26,7 @@
 #include <memory>
 
 #include <traj_opt/config.hpp>
-#include <traj_opt/minco.h>
+#include <utils/optimization/minco.h>
 
 #include <data_structure/base/polytope.h>
 #include <data_structure/base/trajectory.h>

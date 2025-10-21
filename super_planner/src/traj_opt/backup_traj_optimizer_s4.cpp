@@ -318,7 +318,7 @@ double BackupTrajOpt::costFunctional(void *ptr, const Eigen::VectorXd &x, Eigen:
 
     StatePVAJ partGradOfHeadPVAJ, partGradOfTailPVAJ;
     Mat3Df partGradOfWaypts;
-    obj.minco.propagateGradOfWayptsAndState(obj.partialGradByCoeffs, obj.partialGradByTimes,
+    obj.minco.propogateGradOfWayptsAndState(obj.partialGradByCoeffs, obj.partialGradByTimes,
                                             obj.gradByTimes,
                                             partGradOfHeadPVAJ,
                                             partGradOfWaypts,

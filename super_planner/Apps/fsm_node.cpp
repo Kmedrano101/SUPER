@@ -23,7 +23,7 @@
 
 
 
-#include <ros_interface/ros2/fsm_ros2.hpp>
+#include <ros_interface/ros/fsm.hpp>
 
 /*
  * Test code:
