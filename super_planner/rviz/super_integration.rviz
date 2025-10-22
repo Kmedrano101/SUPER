@@ -320,11 +320,11 @@ Visualization Manager:
       Namespaces:
         {}
       Topic:
-        Depth: 5
+        Depth: 100
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /trajectory
+        Reliability Policy: Best Effort
+        Value: /visualization/exp_traj
       Value: true
 
     # Safe Flight Corridors
@@ -334,11 +334,11 @@ Visualization Manager:
       Namespaces:
         {}
       Topic:
-        Depth: 5
+        Depth: 100
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /corridor
+        Reliability Policy: Best Effort
+        Value: /visualization/exp_sfc
       Value: true
 
     # A* Searched Path
@@ -362,11 +362,11 @@ Visualization Manager:
       Namespaces:
         {}
       Topic:
-        Depth: 5
+        Depth: 100
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /backup_traj
+        Reliability Policy: Best Effort
+        Value: /visualization/backup_traj
       Value: true
 
     # Yaw Trajectory
@@ -380,7 +380,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /yaw_traj
+        Value: /visualization/yaw_traj
       Value: false
 
     # Planning visualization markers (from planner)
@@ -390,11 +390,11 @@ Visualization Manager:
       Namespaces:
         {}
       Topic:
-        Depth: 5
+        Depth: 100
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /visualization_marker_array
+        Reliability Policy: Best Effort
+        Value: /visualization/goal
       Value: true
 
   Enabled: true

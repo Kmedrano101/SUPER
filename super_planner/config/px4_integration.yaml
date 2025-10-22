@@ -3,220 +3,223 @@
 # Date: 2025
 # Author: Kevin Medrano Ayala
 
-fsm:
-  # Goal input - Use RViz 2D Goal Pose or custom goal publisher
-  click_goal_en: true
-  click_goal_topic: "/goal_pose"              # 🔧 Changed to match RViz default
-  click_height: 1.5                            # Default Z height for clicked goals
-  click_yaw_en: true
 
-  # Replanning rate - Conservative for PX4 integration
-  replan_rate: 10.0                            # 🔧 Reduced from 15 Hz for stability
-
-  # Command output topics
-  cmd_topic: "/planning/pos_cmd"               # → px4_super_bridge subscribes here
-  mpc_cmd_topic: "/planning_cmd/poly_traj"     # Alternative for MPC controllers
-
-  timer_en: true
-
-super_planner:
-  # Safety features
-  backup_traj_en: true                         # Enable emergency backup trajectory
-  detailed_log_en: false
-  visualization_en: true                       # Enable RViz visualization
-
-  # FOV and logging
-  use_fov_cut: false
-  print_log: false
-  visual_process: false
-  frontend_in_known_free: false
-
-  # Goal settings
-  goal_yaw_en: false                           # Don't force specific yaw at goal
-  goal_vel_en: false                           # Don't force specific velocity at goal
-
-  # Corridor generation parameters
-  corridor_bound_dis: 3.0                      # Safety margin from obstacles (m)
-  corridor_line_max_length: 3.0                # Max corridor segment length (m)
-  safe_corridor_line_max_length: 999.0
-  iris_iter_num: 2                             # CIRI iterations (2 is good balance)
-  obs_skip_num: 2
-
-  # Planning horizons
-  replan_forward_dt: 0.1
-  planning_horizon: 20.0                       # 🔧 Reduced from 30m for local planning
-  sensing_horizon: -1                          # -1 = use full sensor range
-  receding_dis: 10.0                           # 🔧 Reduced from 15m
-
-  # Robot parameters for PX4 drone
-  robot_r: 0.3                                 # 🔧 Robot radius (adjust for your drone)
-  yaw_dot_max: 1.5                             # 🔧 Reduced max yaw rate for stability (rad/s)
-
-  # Yaw mode: 1 = heading to velocity, 2 = heading to goal
-  yaw_mode: 1                                  # Follow velocity direction
-
-  mpc_horizon: 15
-
-# Trajectory Optimization Parameters
-traj_opt:
-  switch:
-    save_log_en: true                          # 🔧 Enable for debugging
-    print_optimizer_log: false
-
-  # Dynamic constraints - CRITICAL FOR PX4 INTEGRATION
-  boundary:
-    max_vel: 5.0                               # 🔧 REDUCED from 25 m/s for safety
-    max_acc: 5.0                               # 🔧 REDUCED from 20 m/s²
-    max_jerk: 30.0                             # 🔧 REDUCED from 120 m/s³
-    max_omg: 3.0                               # 🔧 REDUCED angular velocity (rad/s)
-    max_acc_thr: 15.0                          # 🔧 REDUCED thrust acceleration
-    min_acc_thr: 6.0
-    penna_margin: 0.05
-
-  # Exploratory trajectory optimization
-  exp_traj:
-    pos_constraint_type: 1                     # 1 for xi, 2 for pos
-    energy_cost_type: 4
-    block_energy_cost: false
-    opt_accuracy: 5.0e-6
-    scale_factor: 1.0
-    integral_reso: 15
-    smooth_eps: 0.01
-    # Penalty weights
-    penna_t: 1.0e+8
-    penna_pos: 5.0e+8
-    penna_vel: 5.0e+8
-    penna_acc: 5.0e+8
-    penna_jerk: -5.0e+11
-    penna_attract: -1.0e+7
-    penna_omg: 5.0e+8
-    penna_thr: 5.0e+8
-
-  # Backup trajectory (emergency stop)
-  backup_traj:
-    uniform_time_en: true
-    pos_constraint_type: 1
-    piece_num: 2
-    energy_cost_type: 4
-    block_energy_cost: true
-    opt_accuracy: 1.0e-6
-    scale_factor: 1.0
-    integral_reso: 12
-    smooth_eps: 0.01
-    penna_t: 1.0e+6
-    penna_ts: 1.0e+7
-    penna_pos: 1.0e+10
-    penna_vel: 1.0e+8
-    penna_acc: 1.0e+8
-    penna_jerk: -1.0e+8
-    penna_omg: 5.0e+8
-    penna_thr: 5.0e+8
-
-  # Flatness-based quadrotor dynamics
-  flatness:
-    mass: 1.5                                  # 🔧 Adjust to your drone mass (kg)
-    dh: 0.35                                   # Horizontal drag coefficient
-    dv: 0.35                                   # Vertical drag coefficient
-    cp: 0.001
-    v_eps: 0.0001
-    grav: 9.81
-
-# A* Global Search Parameters
-astar:
-  map_voxel_num: [400, 400, 80]                # 🔧 Adjusted for typical indoor/outdoor
-  visual_process: false
-  allow_diag: true
-  heu_type: 2                                  # 0=DIAG, 1=MANHATTAN, 2=EUCLIDEAN
-  debug_visualization_en: false
-
-# ROG-Map Configuration - CRITICAL FOR FAST-LIO INTEGRATION
-rog_map:
-  # Map resolution
-  resolution: 0.3                              # Voxel size (m)
-  inflation_resolution: 0.3                    # Inflation grid size (m)
-  inflation_step: 2                            # Inflation radius in voxels
-  unk_inflation_en: false
-  unk_inflation_step: 1
-
-  # Map size - Local sliding window
-  map_size: [30, 30, 6]                        # 🔧 [x, y, z] in meters (local map)
-  fix_map_origin: [0, 0, 1.5]                  # Origin if map_sliding disabled
-
-  frontier_extraction_en: false                # Disable exploration frontier
-
-  # Virtual boundaries
-  virtual_ceil_height: 5.0                     # Virtual ceiling (m)
-  virtual_ground_height: -0.5                  # Virtual floor (m)
-
-  load_pcd_en: false                           # Don't load static PCD
-
-  # Map sliding (robocentric)
-  map_sliding:
-    enable: true                               # 🔧 Enable for moving robot
-    threshold: 1.0                             # Min distance to trigger slide (m)
-
-  # ESDF (Euclidean Signed Distance Field) - Optional
-  esdf:
-    enable: false                              # Disable if not needed (saves CPU)
-    resolution: 0.1
-    local_update_box: [5, 5, 3]
-
-  # ROS Topic Interface - CRITICAL CONFIGURATION
-  ros_callback:
-    ros_callback_en: true                      # ✅ Enable ROS topic subscriptions
-    cloud_topic: "/cloud_registered"           # ✅ FAST-LIO output
-    odom_topic: "/Odometry"                    # ✅ FAST-LIO output
-    odom_timeout: 2.0                          # Timeout for odometry loss (s)
-
-  # Visualization settings
-  visualization:
-    enable: true
-    use_dynamic_reconfigure: false
-    time_rate: 2                               # Visualization update rate (Hz)
-    frame_rate: 0
-    range: [20, 20, 5]                         # 🔧 Visualization range [x, y, z] (m)
-    frame_id: "camera_init"                    # 🔧 FAST-LIO world frame
-    pub_unknown_map_en: false
-
-  # Point cloud filtering
-  intensity_thresh: -10                        # Min intensity (disable filter)
-  point_filt_num: 1                            # Temporal downsample (1 = no downsample)
-
-  # Probabilistic update (raycasting)
-  raycasting:
-    enable: false                              # Disable for faster performance
-    batch_update_size: 1
-    local_update_box: [100, 100, 5]
-    ray_range: [0.5, 100]
-
-    # Probability thresholds
-    p_min: 0.12
-    p_miss: 0.49
-    p_free: 0.499
-    p_occ: 0.85
-    p_hit: 0.9
-    p_max: 0.98
-    unk_thresh: 1.0
-
-# Notes:
-# 🔧 = Modified from default high_speed.yaml
-# ✅ = Already matches your system topics
-#
-# Your current topics:
-#   FAST-LIO outputs:
-#     /Odometry              → ROG-Map odom input
-#     /cloud_registered      → ROG-Map cloud input
-#     /path                  → Visualization
-#
-#   SUPER outputs:
-#     /planning/pos_cmd      → px4_super_bridge input
-#     /planning_cmd/poly_traj → Alternative controller
-#
-#   Goal inputs:
-#     /goal_pose             → RViz 2D Goal Pose
-#     /clicked_point         → Alternative (not used)
-#
-# Safety limits explained:
-#   max_vel: 5.0 m/s    = 18 km/h (safe for testing, increase gradually)
-#   max_acc: 5.0 m/s²   = 0.5g (comfortable for PX4)
-#   max_jerk: 30 m/s³   = smooth trajectory changes
+/**:
+  ros__parameters:
+    fsm:
+      # Goal input - Use RViz 2D Goal Pose or custom goal publisher
+      click_goal_en: true
+      click_goal_topic: "/goal_pose"              # 🔧 Changed to match RViz default
+      click_height: 1.5                            # Default Z height for clicked goals
+      click_yaw_en: true
+    
+      # Replanning rate - Conservative for PX4 integration
+      replan_rate: 10.0                            # 🔧 Reduced from 15 Hz for stability
+    
+      # Command output topics
+      cmd_topic: "/planning/pos_cmd"               # → px4_super_bridge subscribes here
+      mpc_cmd_topic: "/planning_cmd/poly_traj"     # Alternative for MPC controllers
+    
+      timer_en: true
+    
+    super_planner:
+      # Safety features
+      backup_traj_en: true                         # Enable emergency backup trajectory
+      detailed_log_en: false
+      visualization_en: true                       # Enable RViz visualization
+    
+      # FOV and logging
+      use_fov_cut: false
+      print_log: false
+      visual_process: false
+      frontend_in_known_free: false
+    
+      # Goal settings
+      goal_yaw_en: false                           # Don't force specific yaw at goal
+      goal_vel_en: false                           # Don't force specific velocity at goal
+    
+      # Corridor generation parameters
+      corridor_bound_dis: 3.0                      # Safety margin from obstacles (m)
+      corridor_line_max_length: 3.0                # Max corridor segment length (m)
+      safe_corridor_line_max_length: 999.0
+      iris_iter_num: 2                             # CIRI iterations (2 is good balance)
+      obs_skip_num: 2
+    
+      # Planning horizons
+      replan_forward_dt: 0.1
+      planning_horizon: 20.0                       # 🔧 Reduced from 30m for local planning
+      sensing_horizon: -1                          # -1 = use full sensor range
+      receding_dis: 10.0                           # 🔧 Reduced from 15m
+    
+      # Robot parameters for PX4 drone
+      robot_r: 0.3                                 # 🔧 Robot radius (adjust for your drone)
+      yaw_dot_max: 1.5                             # 🔧 Reduced max yaw rate for stability (rad/s)
+    
+      # Yaw mode: 1 = heading to velocity, 2 = heading to goal
+      yaw_mode: 1                                  # Follow velocity direction
+    
+      mpc_horizon: 15
+    
+    # Trajectory Optimization Parameters
+    traj_opt:
+      switch:
+        save_log_en: true                          # 🔧 Enable for debugging
+        print_optimizer_log: false
+    
+      # Dynamic constraints - CRITICAL FOR PX4 INTEGRATION
+      boundary:
+        max_vel: 5.0                               # 🔧 REDUCED from 25 m/s for safety
+        max_acc: 5.0                               # 🔧 REDUCED from 20 m/s²
+        max_jerk: 30.0                             # 🔧 REDUCED from 120 m/s³
+        max_omg: 3.0                               # 🔧 REDUCED angular velocity (rad/s)
+        max_acc_thr: 15.0                          # 🔧 REDUCED thrust acceleration
+        min_acc_thr: 6.0
+        penna_margin: 0.05
+    
+      # Exploratory trajectory optimization
+      exp_traj:
+        pos_constraint_type: 1                     # 1 for xi, 2 for pos
+        energy_cost_type: 4
+        block_energy_cost: false
+        opt_accuracy: 5.0e-6
+        scale_factor: 1.0
+        integral_reso: 15
+        smooth_eps: 0.01
+        # Penalty weights
+        penna_t: 1.0e+8
+        penna_pos: 5.0e+8
+        penna_vel: 5.0e+8
+        penna_acc: 5.0e+8
+        penna_jerk: -5.0e+11
+        penna_attract: -1.0e+7
+        penna_omg: 5.0e+8
+        penna_thr: 5.0e+8
+    
+      # Backup trajectory (emergency stop)
+      backup_traj:
+        uniform_time_en: true
+        pos_constraint_type: 1
+        piece_num: 2
+        energy_cost_type: 4
+        block_energy_cost: true
+        opt_accuracy: 1.0e-6
+        scale_factor: 1.0
+        integral_reso: 12
+        smooth_eps: 0.01
+        penna_t: 1.0e+6
+        penna_ts: 1.0e+7
+        penna_pos: 1.0e+10
+        penna_vel: 1.0e+8
+        penna_acc: 1.0e+8
+        penna_jerk: -1.0e+8
+        penna_omg: 5.0e+8
+        penna_thr: 5.0e+8
+    
+      # Flatness-based quadrotor dynamics
+      flatness:
+        mass: 1.5                                  # 🔧 Adjust to your drone mass (kg)
+        dh: 0.35                                   # Horizontal drag coefficient
+        dv: 0.35                                   # Vertical drag coefficient
+        cp: 0.001
+        v_eps: 0.0001
+        grav: 9.81
+    
+    # A* Global Search Parameters
+    astar:
+      map_voxel_num: [400.0, 400.0, 80.0]                # 🔧 Adjusted for typical indoor/outdoor
+      visual_process: false
+      allow_diag: true
+      heu_type: 2                                  # 0=DIAG, 1=MANHATTAN, 2=EUCLIDEAN
+      debug_visualization_en: false
+    
+    # ROG-Map Configuration - CRITICAL FOR FAST-LIO INTEGRATION
+    rog_map:
+      # Map resolution
+      resolution: 0.3                              # Voxel size (m)
+      inflation_resolution: 0.3                    # Inflation grid size (m)
+      inflation_step: 2                            # Inflation radius in voxels
+      unk_inflation_en: false
+      unk_inflation_step: 1
+    
+      # Map size - Local sliding window
+      map_size: [30.0, 30.0, 6.0]                        # 🔧 [x, y, z] in meters (local map)
+      fix_map_origin: [0.0, 0.0, 1.5]                  # Origin if map_sliding disabled
+    
+      frontier_extraction_en: false                # Disable exploration frontier
+    
+      # Virtual boundaries
+      virtual_ceil_height: 5.0                     # Virtual ceiling (m)
+      virtual_ground_height: -0.5                  # Virtual floor (m)
+    
+      load_pcd_en: false                           # Don't load static PCD
+    
+      # Map sliding (robocentric)
+      map_sliding:
+        enable: true                               # 🔧 Enable for moving robot
+        threshold: 1.0                             # Min distance to trigger slide (m)
+    
+      # ESDF (Euclidean Signed Distance Field) - Optional
+      esdf:
+        enable: false                              # Disable if not needed (saves CPU)
+        resolution: 0.1
+        local_update_box: [5.0, 5.0, 3.0]
+    
+      # ROS Topic Interface - CRITICAL CONFIGURATION
+      ros_callback:
+        ros_callback_en: true                      # ✅ Enable ROS topic subscriptions
+        cloud_topic: "/cloud_registered"           # ✅ FAST-LIO output
+        odom_topic: "/Odometry"                    # ✅ FAST-LIO output
+        odom_timeout: 2.0                          # Timeout for odometry loss (s)
+    
+      # Visualization settings
+      visualization:
+        enable: true
+        use_dynamic_reconfigure: false
+        time_rate: 2                               # Visualization update rate (Hz)
+        frame_rate: 0
+        range: [20.0, 20.0, 5.0]                         # 🔧 Visualization range [x, y, z] (m)
+        frame_id: "camera_init"                    # 🔧 FAST-LIO world frame
+        pub_unknown_map_en: false
+    
+      # Point cloud filtering
+      intensity_thresh: -10                        # Min intensity (disable filter)
+      point_filt_num: 1                            # Temporal downsample (1 = no downsample)
+    
+      # Probabilistic update (raycasting)
+      raycasting:
+        enable: false                              # Disable for faster performance
+        batch_update_size: 1
+        local_update_box: [100.0, 100.0, 5.0]
+        ray_range: [0.5, 100.0]
+    
+        # Probability thresholds
+        p_min: 0.12
+        p_miss: 0.49
+        p_free: 0.499
+        p_occ: 0.85
+        p_hit: 0.9
+        p_max: 0.98
+        unk_thresh: 1.0
+    
+    # Notes:
+    # 🔧 = Modified from default high_speed.yaml
+    # ✅ = Already matches your system topics
+    #
+    # Your current topics:
+    #   FAST-LIO outputs:
+    #     /Odometry              → ROG-Map odom input
+    #     /cloud_registered      → ROG-Map cloud input
+    #     /path                  → Visualization
+    #
+    #   SUPER outputs:
+    #     /planning/pos_cmd      → px4_super_bridge input
+    #     /planning_cmd/poly_traj → Alternative controller
+    #
+    #   Goal inputs:
+    #     /goal_pose             → RViz 2D Goal Pose
+    #     /clicked_point         → Alternative (not used)
+    #
+    # Safety limits explained:
+    #   max_vel: 5.0 m/s    = 18 km/h (safe for testing, increase gradually)
+    #   max_acc: 5.0 m/s²   = 0.5g (comfortable for PX4)
+    #   max_jerk: 30 m/s³   = smooth trajectory changes

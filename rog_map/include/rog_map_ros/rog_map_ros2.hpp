@@ -96,8 +96,8 @@ namespace rog_map {
 
             geometry_msgs::msg::TransformStamped transformStamped;
             transformStamped.header.stamp = nh_->get_clock()->now();
-            transformStamped.header.frame_id = "world";
-            transformStamped.child_frame_id = "drone";
+            transformStamped.header.frame_id = odom_msg->header.frame_id;  // Use odometry parent frame (camera_init)
+            transformStamped.child_frame_id = odom_msg->child_frame_id;    // Use odometry child frame (body)
             transformStamped.transform.translation.x = odom_msg->pose.pose.position.x;
             transformStamped.transform.translation.y = odom_msg->pose.pose.position.y;
             transformStamped.transform.translation.z = odom_msg->pose.pose.position.z;
@@ -225,7 +225,7 @@ namespace rog_map {
                     PointCloud pc;
                     esdf_map_->getPositiveESDFPointCloud(box_min, box_max, robot_state_.p.z() - 0.5, pc);
                     pcl::toROSMsg(pc, cloud_msg);
-                    cloud_msg.header.frame_id = "world";
+                    cloud_msg.header.frame_id = "camera_init";
                     cloud_msg.header.stamp = nh_->get_clock()->now();
                     vm_.esdf_pub->publish(cloud_msg);
                 }
@@ -234,7 +234,7 @@ namespace rog_map {
                 //     PointCloud pc;
                 //     esdf_map_->getNegativeESDFPointCloud(box_min, box_max, robot_state_.p.z() - 0.5, pc);
                 //     pcl::toROSMsg(pc, cloud_msg);
-                //     cloud_msg.header.frame_id = "world";
+                //     cloud_msg.header.frame_id = "camera_init";
                 //     cloud_msg.header.stamp = nh_->get_clock()->now();
                 //     vm_.esdf_neg_pub->publish(cloud_msg);
                 // }
@@ -305,17 +305,17 @@ namespace rog_map {
             }
             pcl::toROSMsg(pcl_cloud, cloud);
             cloud.header.stamp = nh_->get_clock()->now();
-            cloud.header.frame_id = "world";
+            cloud.header.frame_id = "camera_init";
         }
 
     public:
         typedef shared_ptr<ROGMapROS> Ptr;
 
         ROGMapROS(const rclcpp::Node::SharedPtr nh, const std::string& cfg_path): nh_(nh) {
-            // TODO: The current implementation uses a lenient QoS configuration for message transmission.
-            const rclcpp::QoS qos(rclcpp::QoS(1)
-                                  .best_effort()
-                                  .keep_last(1)
+            // QoS configuration for message transmission - Changed to RELIABLE for FAST-LIO compatibility
+            const rclcpp::QoS qos(rclcpp::QoS(10)
+                                  .reliable()
+                                  .keep_last(10)
                                   .durability_volatile());
 
             cfg_ = rog_map::Config(cfg_path);
@@ -392,7 +392,7 @@ namespace rog_map {
             int id = 0;
             visualization_msgs::msg::Marker line_strip;
             line_strip.header.stamp = rclcpp::Time(stamp);
-            line_strip.header.frame_id = "world";
+            line_strip.header.frame_id = "camera_init";
             line_strip.action = visualization_msgs::msg::Marker::ADD;
             line_strip.ns = ns;
             line_strip.pose.orientation.w = 1.0;
@@ -456,7 +456,7 @@ namespace rog_map {
                                   const double& size = 0.6,
                                   const int& id = -1) {
             visualization_msgs::msg::Marker marker;
-            marker.header.frame_id = "world";
+            marker.header.frame_id = "camera_init";
             marker.header.stamp = rclcpp::Time(stamp);
             marker.action = visualization_msgs::msg::Marker::ADD;
             marker.pose.orientation.w = 1.0;
@@ -492,7 +492,7 @@ namespace rog_map {
             if (isnan(pt.x()) || isnan(pt.y()) || isnan(pt.z())) {
                 return;
             }
-            marker_ball.header.frame_id = "world";
+            marker_ball.header.frame_id = "camera_init";
             marker_ball.header.stamp = rclcpp::Time(stamp);
             marker_ball.ns = ns.c_str();
             marker_ball.id = id >= 0 ? id : cnt++;
@@ -515,7 +515,7 @@ namespace rog_map {
             // add test
             if (print_ns) {
                 visualization_msgs::msg::Marker marker;
-                marker.header.frame_id = "world";
+                marker.header.frame_id = "camera_init";
                 marker.header.stamp = rclcpp::Time(stamp);
                 marker.action = visualization_msgs::msg::Marker::ADD;
                 marker.pose.orientation.w = 1.0;

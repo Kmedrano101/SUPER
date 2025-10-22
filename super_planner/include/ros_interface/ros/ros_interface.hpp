@@ -116,7 +116,7 @@ namespace ros_interface {
             if (exp_traj_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(exp_traj_pub_);
+            // Ros1Adapter::deleteAllMarkerArray(exp_traj_pub_);  // COMMENTED OUT: Keep trajectory visible for testing
             visualization_msgs::msg::MarkerArray mkr_arr;
             Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, traj, ns, Color::Green(), 0.08, true, true);
             exp_traj_pub_->publish(mkr_arr);

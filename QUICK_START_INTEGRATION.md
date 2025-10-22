@@ -32,7 +32,7 @@ GAZEBO SENSORS → FAST-LIO → ROG-MAP → SUPER → (px4_super_bridge) → PX4
 ```bash
 cd ~/ros2_ws
 source install/setup.bash
-ros2 launch px4_offboard_sim simulation.launch.py
+ros2 launch px4_offboard_sim slam_simulation.launch.py
 ```
 **Wait for**: Gazebo GUI, vehicle spawned
 
@@ -52,11 +52,15 @@ ros2 launch fast_lio_ros2 simulation_mapping.launch.py config_file:=gazebosim.ya
 ```bash
 cd ~/super_ws
 source install/setup.bash
-ros2 run super_planner fsm_node \
-  --ros-args \
-  --params-file ~/super_ws/src/SUPER/super_planner/config/px4_integration.yaml
+ros2 launch super_planner test_super_planner.launch.py
 ```
 **Wait for**: "Odometry received! Building map..." message
+
+**Note**: This launches SUPER with the `px4_integration.yaml` config by default. To use a different config:
+```bash
+ros2 launch super_planner test_super_planner.launch.py \
+  config_file:=/path/to/your/config.yaml
+```
 
 ---
 
@@ -86,11 +90,25 @@ ros2 topic hz /planning/pos_cmd      # Should show ~100 Hz (after goal sent)
 ```
 
 ### Visual check in RViz:
+
+**Option 1: Launch with SUPER (automatic)**
 ```bash
-rviz2
+# RViz is launched automatically with Terminal 3 command above
+# Uses super_test.rviz configuration
 ```
-- Set Fixed Frame: `camera_init`
-- Add: Odometry (`/Odometry`), PointCloud2 (`/cloud_registered`), Path (`/fsm/path`)
+
+**Option 2: Launch RViz separately**
+```bash
+# In a new terminal
+cd ~/super_ws
+source install/setup.bash
+rviz2 -d ~/super_ws/src/SUPER/super_planner/rviz/super_integration.rviz
+```
+
+**Option 3: Launch SUPER without RViz**
+```bash
+ros2 launch super_planner test_super_planner.launch.py rviz:=false
+```
 
 ---
 
@@ -150,5 +168,30 @@ All settings in one place: `super_planner/config/px4_integration.yaml`
 
 **Ready to test ROG-MAP integration!** 🚀
 
-Start with Terminal 1, then 2, then 3, then send a goal from Terminal 4.
+## Quick Launch Summary
+
+**Sequential startup (recommended):**
+1. Terminal 1: `ros2 launch px4_offboard_sim slam_simulation.launch.py`
+2. Terminal 2: `ros2 launch fast_lio_ros2 simulation_mapping.launch.py config_file:=gazebosim.yaml`
+3. Terminal 3: `ros2 launch super_planner test_super_planner.launch.py`
+4. Terminal 4: Send goal via command line or use RViz "2D Goal Pose" tool
+
+**Launch options for Terminal 3:**
+```bash
+# Default (with RViz using super_test.rviz)
+ros2 launch super_planner test_super_planner.launch.py
+
+# Without RViz
+ros2 launch super_planner test_super_planner.launch.py rviz:=false
+
+# Custom config file
+ros2 launch super_planner test_super_planner.launch.py \
+  config_file:=/path/to/custom.yaml
+
+# All options combined
+ros2 launch super_planner test_super_planner.launch.py \
+  config_file:=/path/to/custom.yaml \
+  rviz:=false \
+  use_sim_time:=true
+```
 

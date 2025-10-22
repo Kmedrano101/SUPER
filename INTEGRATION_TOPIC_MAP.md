@@ -172,9 +172,7 @@ ros2 launch fast_lio_ros2 mapping.launch.py \
 # Terminal 3: Launch SUPER Planner
 cd ~/super_ws
 source install/setup.bash
-ros2 run super_planner fsm_node \
-  --ros-args \
-  --params-file ~/super_ws/src/SUPER/super_planner/config/px4_integration.yaml
+ros2 launch super_planner test_super_planner.launch.py
 # Publishes: /planning/pos_cmd, /planning_cmd/poly_traj
 
 # Terminal 4: Monitor topics

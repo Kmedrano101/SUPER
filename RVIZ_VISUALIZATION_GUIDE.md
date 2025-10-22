@@ -189,18 +189,22 @@ ros2 launch fast_lio_ros2 simulation_mapping.launch.py config_file:=gazebosim.ya
 ```
 **Wait for**: "Publishing to /Odometry" message
 
-#### Terminal 3: SUPER Planner
+#### Terminal 3: SUPER Planner (with RViz)
 ```bash
 cd ~/super_ws
 source install/setup.bash
-ros2 run super_planner fsm_node \
-  --ros-args \
-  --params-file ~/super_ws/src/SUPER/super_planner/config/px4_integration.yaml
+ros2 launch super_planner test_super_planner.launch.py
 ```
 **Wait for**: "Odometry received! Building map..." message
 
-#### Terminal 4: RViz
+**Note**: This automatically launches RViz with `super_test.rviz`. To disable RViz:
 ```bash
+ros2 launch super_planner test_super_planner.launch.py rviz:=false
+```
+
+#### Terminal 4 (Optional): RViz with Full Integration Config
+```bash
+# Use this if you want the comprehensive visualization config instead
 cd ~/super_ws
 source install/setup.bash
 rviz2 -d ~/super_ws/src/SUPER/super_planner/rviz/super_integration.rviz
@@ -526,11 +530,11 @@ ros2 launch px4_offboard_sim simulation.launch.py
 # Terminal 2
 ros2 launch fast_lio_ros2 simulation_mapping.launch.py config_file:=gazebosim.yaml
 
-# Terminal 3
-ros2 run super_planner fsm_node --ros-args \
-  --params-file ~/super_ws/src/SUPER/super_planner/config/px4_integration.yaml
+# Terminal 3 (with automatic RViz)
+ros2 launch super_planner test_super_planner.launch.py
 
-# Terminal 4
+# OR Terminal 3 (without RViz) + Terminal 4 (custom RViz)
+ros2 launch super_planner test_super_planner.launch.py rviz:=false
 rviz2 -d ~/super_ws/src/SUPER/super_planner/rviz/super_integration.rviz
 ```
 

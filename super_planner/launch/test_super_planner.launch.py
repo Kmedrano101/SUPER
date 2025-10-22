@@ -65,7 +65,7 @@ def generate_launch_description():
 
     # RViz Node (optional)
     rviz_config_file = os.path.join(
-        super_planner_dir, 'rviz', 'super_test.rviz'
+        super_planner_dir, 'rviz', 'super_integration.rviz'
     )
 
     # Create a proper launch condition

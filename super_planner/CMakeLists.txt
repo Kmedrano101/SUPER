@@ -115,13 +115,12 @@ ament_target_dependencies(fsm_node PUBLIC
 
 install(
         TARGETS
+        super
         fsm_node
         RUNTIME DESTINATION lib/${PROJECT_NAME}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
-        RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_export_include_directories(${includes})
