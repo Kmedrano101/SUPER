@@ -4,6 +4,35 @@
 
 ---
 
+## 🎯 Quick Start Test Mode (ENABLED)
+
+**Current Configuration: Simple Point-to-Path Test**
+
+The system is now configured for **basic path generation testing**:
+
+✅ **What's ENABLED:**
+- Goal point input (via `/goal_pose` topic or RViz)
+- Initial path generation by SUPER planner
+- Path visualization in RViz
+- Command publishing to `/planning/pos_cmd` (at 100 Hz)
+
+❌ **What's DISABLED:**
+- **Continuous replanning** during trajectory following
+- **Real-time path cleaning** and optimization
+- Dynamic trajectory updates based on new obstacles
+
+**Why this mode?**
+This simplified mode allows you to:
+1. Send a goal point to SUPER
+2. See the complete path generated from current position to goal
+3. Verify the planner works without complex real-time operations
+
+**To enable full navigation mode** (continuous replanning):
+- Uncomment lines 340-348 in `/home/kmedrano/super_ws/src/SUPER/super_planner/include/ros_interface/ros/fsm.hpp`
+- Rebuild the workspace: `cd ~/super_ws && colcon build --packages-select super_planner`
+
+---
+
 ## Complete Data Flow
 
 ```
@@ -75,6 +104,22 @@ ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped \
          orientation: {w: 1.0}}}'
 ```
 **Expected**: Commands start publishing at `/planning/pos_cmd`
+
+**What you'll see in Quick Start Test Mode:**
+1. SUPER generates the **initial path** from current position to goal
+2. The trajectory is published to `/planning/pos_cmd` at 100 Hz
+3. **The path will NOT update** as the robot moves (replanning disabled)
+4. You can visualize the full trajectory in RViz
+5. Send a new goal to generate a new path from the current position
+
+**To test:**
+```bash
+# Monitor the generated commands
+ros2 topic echo /planning/pos_cmd --once
+
+# Check trajectory visualization
+ros2 topic list | grep planning
+```
 
 ---
 

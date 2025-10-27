@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /SUPER Planning1
-        - /ROG-MAP1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz_common/Selection
@@ -31,7 +29,6 @@ Panels:
 Visualization Manager:
   Class: ""
   Displays:
-    # ============ LOCALIZATION (FAST-LIO) ============
     - Class: rviz_default_plugins/TF
       Enabled: true
       Frame Timeout: 15
@@ -39,7 +36,7 @@ Visualization Manager:
         All Enabled: true
         body:
           Value: true
-        camera_init:
+        world:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -47,7 +44,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        camera_init:
+        world:
           body:
             {}
       Update Interval: 0
@@ -119,13 +116,11 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /path
       Value: true
-
-    # ============ MAPPING (FAST-LIO + ROG-MAP) ============
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 11.062739372253418
-        Min Value: -13.864188194274902
+        Max Value: 2.612546682357788
+        Min Value: -0.36068305373191833
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -189,8 +184,6 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: false
-
-    # ============ ROG-MAP Occupancy Grid ============
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -213,7 +206,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 5
-      Size (m): 0.15000000074505806
+      Size (m): 0.15000000596046448
       Style: Boxes
       Topic:
         Depth: 5
@@ -247,7 +240,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 4
-      Size (m): 0.12000000074505806
+      Size (m): 0.11999999731779099
       Style: Boxes
       Topic:
         Depth: 5
@@ -259,13 +252,10 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: false
       Value: false
-
-    # ============ SUPER PLANNING ============
-    # Goal Pose
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.10000000149011612
-      Class: rviz_default_plugins/PoseStamped
+      Class: rviz_default_plugins/Pose
       Color: 255; 25; 0
       Enabled: true
       Head Length: 0.30000001192092896
@@ -282,8 +272,6 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /goal_pose
       Value: true
-
-    # Executed Flight Path
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
@@ -312,10 +300,8 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /fsm/path
       Value: true
-
-    # Planned Trajectory
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: Planned Trajectory
       Namespaces:
         {}
@@ -325,11 +311,9 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /visualization/exp_traj
-      Value: true
-
-    # Safe Flight Corridors
+      Value: false
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: Safe Corridors
       Namespaces:
         {}
@@ -339,9 +323,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /visualization/exp_sfc
-      Value: true
-
-    # A* Searched Path
+      Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: true
       Name: A* Search Path
@@ -350,14 +332,13 @@ Visualization Manager:
       Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /searched_path
       Value: true
-
-    # Backup/Emergency Trajectory
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: Backup Trajectory
       Namespaces:
         {}
@@ -367,9 +348,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /visualization/backup_traj
-      Value: true
-
-    # Yaw Trajectory
+      Value: false
     - Class: rviz_default_plugins/MarkerArray
       Enabled: false
       Name: Yaw Trajectory
@@ -382,8 +361,6 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /visualization/yaw_traj
       Value: false
-
-    # Planning visualization markers (from planner)
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: Planning Markers
@@ -396,11 +373,10 @@ Visualization Manager:
         Reliability Policy: Best Effort
         Value: /visualization/goal
       Value: true
-
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: camera_init
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -443,25 +419,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 25.0
+      Distance: 25
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0
-        Y: 0.0
+        X: 0
+        Y: 0
         Z: 1.5
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7853981633974483
+      Pitch: 0.7853981852531433
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.7853981633974483
+      Yaw: 0.7853981852531433
     Saved: ~
 Window Geometry:
   Displays:
@@ -479,5 +455,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1453
-  X: 368
-  Y: 104
+  X: 15
+  Y: 111

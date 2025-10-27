@@ -116,9 +116,9 @@ namespace ros_interface {
             if (exp_traj_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            // Ros1Adapter::deleteAllMarkerArray(exp_traj_pub_);  // COMMENTED OUT: Keep trajectory visible for testing
+            // Ros2Adapter::deleteAllMarkerArray(exp_traj_pub_);  // COMMENTED OUT: Keep trajectory visible for testing
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, traj, ns, Color::Green(), 0.08, true, true);
+            Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, traj, ns, Color::Green(), 0.08, true, true);
             exp_traj_pub_->publish(mkr_arr);
         }
 
@@ -129,9 +129,9 @@ namespace ros_interface {
             if (backup_traj_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(backup_traj_pub_);
+            Ros2Adapter::deleteAllMarkerArray(backup_traj_pub_);
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, traj, "backup_traj", Color::Green(), 0.08, true, false);
+            Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, traj, "backup_traj", Color::Green(), 0.08, true, false);
             backup_traj_pub_->publish(mkr_arr);
         }
 
@@ -139,9 +139,9 @@ namespace ros_interface {
             if (!visualization_en_) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(guide_path_pub_);
+            Ros2Adapter::deleteAllMarkerArray(guide_path_pub_);
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addPathToMarkerArray(mkr_arr, path, Color::Pink(), "guide_path", 0.1, 0.05);
+            Ros2Adapter::addPathToMarkerArray(mkr_arr, path, Color::Pink(), "guide_path", 0.1, 0.05);
             guide_path_pub_->publish(mkr_arr);
         }
 
@@ -152,7 +152,7 @@ namespace ros_interface {
             if (exp_sfcs_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(exp_sfcs_pub_);
+            // Ros2Adapter::deleteAllMarkerArray(exp_sfcs_pub_);  // COMMENTED OUT: Keep safe corridors visible for testing
             visualization_msgs::msg::MarkerArray mkr_arr;
             int color_num = sfcs.size();
             int color_id = 0;
@@ -161,7 +161,7 @@ namespace ros_interface {
                 Vec3f color_mag = tinycolormap::GetColor(color_ratio, tinycolormap::ColormapType::Jet).ConvertToEigen();
                 color_id++;
                 Color c(color_mag[0], color_mag[1], color_mag[2]);
-                Ros1Adapter::addPolytopeToMarkerArray(mkr_arr, p,
+                Ros2Adapter::addPolytopeToMarkerArray(mkr_arr, p,
                                                       "exp_sfc", false,
                                                       Color::SteelBlue(), c,
                                                       Color::Orange(), 0.15,
@@ -177,9 +177,9 @@ namespace ros_interface {
             if (backup_sfc_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(backup_sfc_pub_);
+            Ros2Adapter::deleteAllMarkerArray(backup_sfc_pub_);
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addPolytopeToMarkerArray(mkr_arr, sfc, "backup_sfc", false, Color::Chartreuse(),
+            Ros2Adapter::addPolytopeToMarkerArray(mkr_arr, sfc, "backup_sfc", false, Color::Chartreuse(),
                                                   Color::Green(),
                                                   Color::Green(),
                                                   0.15,
@@ -196,10 +196,10 @@ namespace ros_interface {
                 return;
             }
 
-            Ros1Adapter::deleteAllMarkerArray(goal_pub_);
+            Ros2Adapter::deleteAllMarkerArray(goal_pub_);
 
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addPathToMarkerArray(mkr_arr, path, Color::Yellow(), "goal", 0.3, 0.15);
+            Ros2Adapter::addPathToMarkerArray(mkr_arr, path, Color::Yellow(), "goal", 0.3, 0.15);
             goal_pub_->publish(mkr_arr);
         }
 
@@ -211,7 +211,7 @@ namespace ros_interface {
             if (committed_traj_pub_->get_subscription_count() <= 0) {
                 return;
             }
-            Ros1Adapter::deleteAllMarkerArray(committed_traj_pub_);
+            Ros2Adapter::deleteAllMarkerArray(committed_traj_pub_);
 
             visualization_msgs::msg::MarkerArray mkr_arr;
 
@@ -229,14 +229,14 @@ namespace ros_interface {
                     return;
                 }
                 visualization_msgs::msg::MarkerArray mkr_arr;
-                Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, exp_traj, "committed_exp", Color::SteelBlue(), 0.08,
+                Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, exp_traj, "committed_exp", Color::SteelBlue(), 0.08,
                                                         true, false);
-                Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, backup_traj, "committed_backup", Color::Green(), 0.1,
+                Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, backup_traj, "committed_backup", Color::Green(), 0.1,
                                                         false, false);
                 committed_traj_pub_->publish(mkr_arr);
             } else {
                 visualization_msgs::msg::MarkerArray mkr_arr;
-                Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, committed_traj, "committed_exp", Color::Green(), 0.1,
+                Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, committed_traj, "committed_exp", Color::Green(), 0.1,
                                                         true, false);
                 committed_traj_pub_->publish(mkr_arr);
             }
@@ -253,9 +253,9 @@ namespace ros_interface {
                 return;
             }
 
-            Ros1Adapter::deleteAllMarkerArray(yaw_traj_pub_);
+            Ros2Adapter::deleteAllMarkerArray(yaw_traj_pub_);
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addYawTrajectoryToMarkerArray(mkr_arr, pos_traj, yaw_traj);
+            Ros2Adapter::addYawTrajectoryToMarkerArray(mkr_arr, pos_traj, yaw_traj);
             yaw_traj_pub_->publish(mkr_arr);
         }
 
@@ -271,7 +271,7 @@ namespace ros_interface {
             }
 
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addBoundingBoxToMarkerArray(mkr_arr, bbox_min, bbox_max, "local_map",
+            Ros2Adapter::addBoundingBoxToMarkerArray(mkr_arr, bbox_min, bbox_max, "local_map",
                                                      Color::Chartreuse());
             astar_mkr_pub_->publish(mkr_arr);
         }
@@ -288,7 +288,7 @@ namespace ros_interface {
             }
 
             visualization_msgs::msg::MarkerArray mkr_arr;
-            Ros1Adapter::addPointToMarkerArray(mkr_arr, position, c, ns, size);
+            Ros2Adapter::addPointToMarkerArray(mkr_arr, position, c, ns, size);
             astar_mkr_pub_->publish(mkr_arr);
         }
 
@@ -305,15 +305,15 @@ namespace ros_interface {
                 return;
             }
 
-            ros_interface::Ros1Adapter::deleteAllMarkerArray(replan_log_mkr_pub_);
+            ros_interface::Ros2Adapter::deleteAllMarkerArray(replan_log_mkr_pub_);
 
             visualization_msgs::msg::MarkerArray mkr_arr;
-            ros_interface::Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, exp_traj, "exp_traj", Color::Orange(), 0.1,
+            ros_interface::Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, exp_traj, "exp_traj", Color::Orange(), 0.1,
                                                                    false, false);
-            ros_interface::Ros1Adapter::addTrajectoryToMarkerArray(mkr_arr, backup_traj, "backup_traj", Color::Green(),
+            ros_interface::Ros2Adapter::addTrajectoryToMarkerArray(mkr_arr, backup_traj, "backup_traj", Color::Green(),
                                                                    0.1, false, false);
-            ros_interface::Ros1Adapter::addYawTrajectoryToMarkerArray(mkr_arr, exp_traj, exp_yaw_traj, "exp_yaw_traj");
-            ros_interface::Ros1Adapter::addYawTrajectoryToMarkerArray(mkr_arr, backup_traj, backup_yaw_traj,
+            ros_interface::Ros2Adapter::addYawTrajectoryToMarkerArray(mkr_arr, exp_traj, exp_yaw_traj, "exp_yaw_traj");
+            ros_interface::Ros2Adapter::addYawTrajectoryToMarkerArray(mkr_arr, backup_traj, backup_yaw_traj,
                                                                       "backup_yaw_traj");
 
 
@@ -325,13 +325,13 @@ namespace ros_interface {
                 Vec3f color_mag = tinycolormap::GetColor(color_ratio, tinycolormap::ColormapType::Jet).ConvertToEigen();
                 color_id++;
                 Color c(color_mag[0], color_mag[1], color_mag[2]);
-                ros_interface::Ros1Adapter::addPolytopeToMarkerArray(mkr_arr, p, "exp_sfc", false, Color::SteelBlue(),
+                ros_interface::Ros2Adapter::addPolytopeToMarkerArray(mkr_arr, p, "exp_sfc", false, Color::SteelBlue(),
                                                                      c,
                                                                      Color::Orange(), 0.15,
                                                                      0.02);
             }
 
-            ros_interface::Ros1Adapter::addPolytopeToMarkerArray(mkr_arr, backup_sfc, "backup_sfc", false,
+            ros_interface::Ros2Adapter::addPolytopeToMarkerArray(mkr_arr, backup_sfc, "backup_sfc", false,
                                                                  Color::Chartreuse(), Color::Green(),
                                                                  Color::Green(),
                                                                  0.15,
@@ -366,7 +366,7 @@ namespace ros_interface {
                 return;
             }
             visualization_msgs::msg::MarkerArray mkr_arr;
-            ros_interface::Ros1Adapter::addLineToMarkerArray(mkr_arr, a, b,
+            ros_interface::Ros2Adapter::addLineToMarkerArray(mkr_arr, a, b,
                                                              Color::Pink(), Color::Orange(), "seed_line",
                                                              robot_r * 2,
                                                              robot_r * 2);
@@ -381,7 +381,7 @@ namespace ros_interface {
                 return;
             }
             visualization_msgs::msg::MarkerArray mkr_arr;
-            ros_interface::Ros1Adapter::addEllipsoidToMarkerArray(mkr_arr, ellipsoid, "ellipsoid", Color(Color::Orange(), 0.3));
+            ros_interface::Ros2Adapter::addEllipsoidToMarkerArray(mkr_arr, ellipsoid, "ellipsoid", Color(Color::Orange(), 0.3));
             ciri_mkr_pub_->publish(mkr_arr);
         }
 
@@ -393,7 +393,7 @@ namespace ros_interface {
                 return;
             }
             visualization_msgs::msg::MarkerArray mkr_arr;
-            ros_interface::Ros1Adapter::addPointToMarkerArray(mkr_arr, p, Color::Red(), "infeasible_pt", 0.1);
+            ros_interface::Ros2Adapter::addPointToMarkerArray(mkr_arr, p, Color::Red(), "infeasible_pt", 0.1);
             ciri_mkr_pub_->publish(mkr_arr);
         }
 
@@ -405,7 +405,7 @@ namespace ros_interface {
                 return;
             }
             visualization_msgs::msg::MarkerArray mkr_arr;
-            ros_interface::Ros1Adapter::addPolytopeToMarkerArray(mkr_arr, polytope, ns, true,
+            ros_interface::Ros2Adapter::addPolytopeToMarkerArray(mkr_arr, polytope, ns, true,
                                                                  Color::Chartreuse(), Color::Green(),
                                                                  Color::Green(),
                                                                  0.15,
@@ -423,7 +423,7 @@ namespace ros_interface {
             }
 
             sensor_msgs::msg::PointCloud2 pc2;
-            ros_interface::Ros1Adapter::addVecPointsToPointCloud2(points, pc2);
+            ros_interface::Ros2Adapter::addVecPointsToPointCloud2(points, pc2);
             ciri_pc_pub_->publish(pc2);
         }
 

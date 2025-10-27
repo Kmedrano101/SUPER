@@ -56,7 +56,7 @@ namespace ros_interface {
 
     const std::string DEFAULT_FRAME_ID = "world";
 
-    class Ros1Adapter {
+    class Ros2Adapter {
     public:
         /* For visualization ============================================================*/
         static void deleteAllMarkerArray(const MarkerArrayPubPtr &pub_) {

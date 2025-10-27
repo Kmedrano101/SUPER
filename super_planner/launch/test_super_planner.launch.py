@@ -63,7 +63,7 @@ def generate_launch_description():
         prefix='bash -c "sleep 2; $0 $@"'  # Wait 2s for other nodes to start
     )
 
-    # RViz Node (optional)
+    # RViz Node (optional) - Using super_integration.rviz (fixed for ROS2)
     rviz_config_file = os.path.join(
         super_planner_dir, 'rviz', 'super_integration.rviz'
     )

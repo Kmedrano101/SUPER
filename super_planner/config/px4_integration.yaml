@@ -14,7 +14,8 @@
       click_yaw_en: true
     
       # Replanning rate - Conservative for PX4 integration
-      replan_rate: 10.0                            # 🔧 Reduced from 15 Hz for stability
+      replan_rate: 10.0                            # 🔧 NOTE: Continuous replanning is DISABLED in quick start mode
+                                                   # See ros_interface/ros/fsm.hpp line 337-348 for details
     
       # Command output topics
       cmd_topic: "/planning/pos_cmd"               # → px4_super_bridge subscribes here
@@ -178,7 +179,7 @@
         time_rate: 2                               # Visualization update rate (Hz)
         frame_rate: 0
         range: [20.0, 20.0, 5.0]                         # 🔧 Visualization range [x, y, z] (m)
-        frame_id: "camera_init"                    # 🔧 FAST-LIO world frame
+        frame_id: "world"                          # 🔧 World frame (FAST-LIO configured to use "world")
         pub_unknown_map_en: false
     
       # Point cloud filtering
