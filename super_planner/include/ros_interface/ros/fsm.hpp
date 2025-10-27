@@ -275,7 +275,11 @@ namespace fsm {
         }
 
         void goalCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-            super_utils::Vec3f goal_p = Vec3f{msg->pose.position.x, msg->pose.position.y, msg->pose.position.z};
+            // 🔧 Transform goal pose to match FAST-LIO coordinate frame
+            // FAST-LIO flips X-axis to align body frame with PX4 (positive X = forward)
+            // Aviation convention: +X forward, +Y right, +Z up
+            super_utils::Vec3f goal_p = Vec3f{-msg->pose.position.x, msg->pose.position.y, msg->pose.position.z};
+
             super_utils::Quatf goal_q = super_utils::Quatf{msg->pose.orientation.w, msg->pose.orientation.x,
                                                            msg->pose.orientation.y, msg->pose.orientation.z};
             setGoalPosiAndYaw(goal_p, goal_q);

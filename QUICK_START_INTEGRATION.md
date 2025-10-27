@@ -99,7 +99,7 @@ source ~/super_ws/install/setup.bash
 
 # Send a goal 5 meters ahead
 ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped \
-'{header: {frame_id: "camera_init"},
+'{header: {frame_id: "world"},
   pose: {position: {x: 5.0, y: 0.0, z: 1.5},
          orientation: {w: 1.0}}}'
 ```

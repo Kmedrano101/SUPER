@@ -257,10 +257,10 @@ Visualization Manager:
       Axes Radius: 0.10000000149011612
       Class: rviz_default_plugins/Pose
       Color: 255; 25; 0
-      Enabled: true
+      Enabled: false
       Head Length: 0.30000001192092896
       Head Radius: 0.20000000298023224
-      Name: Goal Pose
+      Name: Goal Pose (Raw Input - Disabled)
       Shaft Length: 1
       Shaft Radius: 0.10000000149011612
       Shape: Arrow
@@ -271,7 +271,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /goal_pose
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
