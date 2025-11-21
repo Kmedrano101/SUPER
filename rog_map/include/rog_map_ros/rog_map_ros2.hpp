@@ -96,8 +96,8 @@ namespace rog_map {
 
             geometry_msgs::msg::TransformStamped transformStamped;
             transformStamped.header.stamp = nh_->get_clock()->now();
-            transformStamped.header.frame_id = odom_msg->header.frame_id;  // Use odometry parent frame (camera_init)
-            transformStamped.child_frame_id = odom_msg->child_frame_id;    // Use odometry child frame (body)
+            transformStamped.header.frame_id = odom_msg->header.frame_id;  // Use odometry parent frame (world)
+            transformStamped.child_frame_id = odom_msg->child_frame_id;    // Use odometry child frame (drone)
             transformStamped.transform.translation.x = odom_msg->pose.pose.position.x;
             transformStamped.transform.translation.y = odom_msg->pose.pose.position.y;
             transformStamped.transform.translation.z = odom_msg->pose.pose.position.z;

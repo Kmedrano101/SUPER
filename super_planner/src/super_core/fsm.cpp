@@ -154,13 +154,10 @@ namespace fsm {
 
                     ChangeState("MainFsmCallback", FOLLOW_TRAJ);
                 } else {
-                    // 🔧 QUICK START MODE: Don't retry on failure, wait for new goal
-                    cout << YELLOW << " -- [Fsm] PlanFromRest failed. Send a new goal to try again." << RESET << endl;
-                    ChangeState("MainFsmCallback", WAIT_GOAL);
-                    gi_.new_goal = false;
-
-                    // For full navigation mode with automatic retries, comment the above and uncomment:
-                    // cout << YELLOW << " -- [Fsm] PlanFromRest failed, try replan." << RESET << endl;
+                    // 🔧 FULL NAVIGATION MODE: Retry planning automatically on failure
+                    // Will keep attempting until successful or goal is cancelled
+                    cout << YELLOW << " -- [Fsm] PlanFromRest failed, try replan." << RESET << endl;
+                    // Don't change state - stay in GENERATE_TRAJ to retry
                 }
                 replan_logs_.push_back(planner_ptr_->getLatestReplanLog());
                 break;

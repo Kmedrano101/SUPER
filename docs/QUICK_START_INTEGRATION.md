@@ -4,32 +4,37 @@
 
 ---
 
-## 🎯 Quick Start Test Mode (ENABLED)
+## 🎯 Full Navigation Mode (ENABLED)
 
-**Current Configuration: Simple Point-to-Path Test**
+**Current Configuration: Continuous Replanning Active**
 
-The system is now configured for **basic path generation testing**:
+The system is configured for **full autonomous navigation** with dynamic replanning:
 
 ✅ **What's ENABLED:**
 - Goal point input (via `/goal_pose` topic or RViz)
-- Initial path generation by SUPER planner
-- Path visualization in RViz
+- **Continuous replanning** at 10 Hz during trajectory following
+- **Real-time path updates** as drone moves
+- Dynamic trajectory optimization based on current position
+- Automatic trajectory regeneration when not at goal
+- Automatic retry on planning failure
 - Command publishing to `/planning/pos_cmd` (at 100 Hz)
 
-❌ **What's DISABLED:**
-- **Continuous replanning** during trajectory following
-- **Real-time path cleaning** and optimization
-- Dynamic trajectory updates based on new obstacles
-
-**Why this mode?**
-This simplified mode allows you to:
+**How it works:**
 1. Send a goal point to SUPER
-2. See the complete path generated from current position to goal
-3. Verify the planner works without complex real-time operations
+2. SUPER generates initial trajectory to goal
+3. **As you move the drone** (manually or autonomously):
+   - Planner continuously replans trajectory from current position
+   - Path adapts to drone's actual movement
+   - Trajectory updates in real-time (10 Hz)
+4. When trajectory completes:
+   - If close to goal (< 0.1m): Waits for new goal
+   - If far from goal: Automatically regenerates trajectory
+5. If planning fails: Automatically retries until successful
 
-**To enable full navigation mode** (continuous replanning):
-- Uncomment lines 340-348 in `/home/kmedrano/super_ws/src/SUPER/super_planner/include/ros_interface/ros/fsm.hpp`
-- Rebuild the workspace: `cd ~/super_ws && colcon build --packages-select super_planner`
+**Perfect for:**
+- Manual keyboard control + autonomous path planning
+- Testing dynamic replanning with obstacle avoidance
+- Preparing for full mission planner integration
 
 ---
 

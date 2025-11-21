@@ -2,6 +2,14 @@
     <h2>SUPER: Safety-assured High-speed Navigation for MAVs</h2>
     <strong>Science Robotics' 25</strong>
     <br>
+    <br>
+    <strong>Repository Maintainer:</strong> <a href="https://github.com/Kmedrano101" target="_blank">Kevin Medrano</a>
+    <br>
+    <em>This is an adapted version of SUPER to work with Gazebo Sim and ROS2 framework</em>
+    <br>
+    <br>
+    <strong>Original Authors:</strong>
+    <br>
         <a href="https://github.com/RENyunfan" target="_blank">Yunfan REN</a>,
 <a href="https://github.com/zfc-zfc" target="_blank">Fangcheng Zhu</a>,
     <a href="https://github.com/genegzl" target="_blank">Guozheng Lu</a>,
