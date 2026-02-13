@@ -1,0 +1,17 @@
+px4_super_bridge:
+  ros__parameters:
+    # SUPER planner input topic
+    pos_cmd_topic: "/planning/pos_cmd"
+
+    # PX4 output topics
+    trajectory_setpoint_topic: "/fmu/in/trajectory_setpoint"
+    offboard_control_mode_topic: "/fmu/in/offboard_control_mode"
+
+    # Control mode: "position" or "position_velocity" (uses both pos + vel feedforward)
+    control_mode: "position_velocity"
+
+    # Command timeout: if no PositionCommand received within this period, stop publishing
+    cmd_timeout: 1.0
+
+    # Publishing rate for offboard heartbeat (Hz)
+    heartbeat_rate: 50.0
