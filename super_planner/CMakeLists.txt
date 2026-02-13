@@ -42,6 +42,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(rosgraph_msgs REQUIRED)
 find_package(PCL REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -75,6 +76,7 @@ set(ros_libs
         tf2_ros
         nav_msgs
         visualization_msgs
+        rosgraph_msgs
         rog_map
         tf2_ros
         pcl_conversions

@@ -9,7 +9,6 @@
 #include "visualization_msgs/msg/marker_array.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
-#include "mavros_msgs/msg/rc_in.hpp"
 #include "Eigen/Core"
 #include "utils/eigen_alias.hpp"
 #include "utils/color_msg_utils.hpp"
@@ -38,12 +37,12 @@ namespace mission_planner {
         rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr mkr_pub_;
 
         rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr click_sub_;
-        rclcpp::Subscription<mavros_msgs::msg::RCIn>::SharedPtr mavros_sub_;
+        // mavros RC trigger removed - using delay or RViz trigger instead
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
 
         rclcpp::TimerBase::SharedPtr goal_pub_timer_;
 
-        rclcpp::CallbackGroup::SharedPtr click_cb_group_, mavros_cb_group_, odom_cb_group_, goal_pub_timer_cb_group_;
+        rclcpp::CallbackGroup::SharedPtr click_cb_group_, odom_cb_group_, goal_pub_timer_cb_group_;
 
         double system_start_time{0};
         bool trigger_once{false};
@@ -76,21 +75,7 @@ namespace mission_planner {
                  " -- [MISSION] Rviz triggered." << RESET << endl;
         }
 
-        void MavrosRcCallback(const mavros_msgs::msg::RCIn::SharedPtr msg) {
-            static int last_ch_10 = 1000;
-            if (!had_odom) {
-                return;
-            }
-            int ch_10 = msg->channels[9];
-            bool pitch_up = msg->channels[1] < 1200;
-            if (last_ch_10 > 1500 && ch_10 < 1500) {
-                triggered = true;
-                new_goal = true;
-                waypoint_counter = 0;
-                cout << YELLOW << " -- [MISSION] Mavros triggered." << RESET << endl;
-            }
-            last_ch_10 = ch_10;
-        }
+        // MavrosRcCallback removed - using delay or RViz trigger instead
 
         void GoalPubTimerCallback() {
             static int last_mkr_sub_num = mkr_pub_->get_subscription_count();
@@ -213,11 +198,6 @@ namespace mission_planner {
             so.callback_group = click_cb_group_;
             click_sub_ = nh_->create_subscription<geometry_msgs::msg::PoseStamped>("/goal", qos, std::bind(
                     &WaypointPlanner::RvizClickCallback, this, std::placeholders::_1), so);
-            mavros_cb_group_ = nh_->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-            so.callback_group = mavros_cb_group_;
-            mavros_sub_ = nh_->create_subscription<mavros_msgs::msg::RCIn>("/mavros/rc/in", qos, std::bind(
-                    &WaypointPlanner::MavrosRcCallback, this, std::placeholders::_1), so);
-
             mkr_pub_ = nh_->create_publisher<visualization_msgs::msg::MarkerArray>("/mission/mkr", qos);
             system_start_time = nh_->now().seconds();
         }

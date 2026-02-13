@@ -34,10 +34,11 @@
 
 
 # Updates
+* **Feb. 13, 2026** - Adapted SUPER for **Gazebo Sim + PX4 SITL** integration with FAST-LIO SLAM. Removed MARSIM dependency. Added `px4_super_bridge` and goal-reached position hold.
 * **Mar. 09, 2025** - The hardware components of SUPER have been released at [SUPER-Hardware](https://github.com/hku-mars/SUPER-Hardware) 🦾
 * **Jan. 29, 2025** - The preview version of SUPER's planning module, supporting both ROS1 and ROS2, is now available! Try it out, and we welcome any issues or contributions.
 * **Jan. 29, 2025** - The paper of SUPER is now featured on the official website of [*Science Robotics*](https://www.science.org/doi/10.1126/scirobotics.ado6187).
-* **Dec. 12, 2024** - 🎉 Our paper has been accepted by *Science Robotics*! 
+* **Dec. 12, 2024** - 🎉 Our paper has been accepted by *Science Robotics*!
 
 Our paper is also aviliable at [here](misc/scirobotics.ado6187.pdf). If our repository supports your academic projects, please cite our work. Thank you!
 
@@ -101,128 +102,112 @@ SUPER serves as the flight platform and navigation system in the video demonstra
 
 <img src="./misc/image-20250130031404057.png" alt="image-20250130031404057" style="zoom:50%;" />
 
-# 2 Quick Start
+# 2 Gazebo Sim + PX4 Integration
 
-## 2.1 Installation
+> **Adapted by [@Kmedrano101](https://github.com/Kmedrano101)**
+>
+> Key modifications from the original SUPER repository:
+> - Replaced MARSIM simulator with **Gazebo Sim + PX4 SITL** for realistic physics and sensor simulation
+> - Integrated **FAST-LIO** for LiDAR-inertial odometry (namespaced topics: `/fast_lio_ros2/*`)
+> - Created **[px4_super_bridge](https://github.com/Kmedrano101)** package to convert SUPER PositionCommand (ENU) to PoseStamped for PX4
+> - Updated `click.yaml` config for Gazebo integration (topics, frame_id, velocity limits, virtual ground)
+> - Added `full_integration_test.launch.py` for launching the complete planning stack
+> - Removed `mars_uav_sim` dependency (MARSIM no longer required)
+> - Configured for **ROS2 Jazzy** + **Ubuntu 24.04**
 
-Install dependencies
+This adapted version replaces MARSIM with **Gazebo Sim** and **PX4 SITL** for simulation, using **FAST-LIO** for LiDAR-inertial odometry. The pipeline is:
 
+```
+PX4 SITL + Gazebo Sim  -->  FAST-LIO SLAM  -->  ROG-Map  -->  SUPER Planner  -->  px4_super_bridge  -->  px4_offboard_sim  -->  PX4
+       (sensors)            (odometry + map)    (occupancy)    (trajectory)       (ENU->PoseStamped)     (NED setpoints)
+```
+
+## 2.1 Prerequisites
+
+**Required packages** (built in `~/ros2_ws`):
+- [px4_offboard_sim](https://github.com/Kmedrano101/px4_offboard_sim) - Offboard flight control with TRAJECTORY mode
+- [fast_lio_ros2](https://github.com/Kmedrano101/fast_lio_ros2) - FAST-LIO SLAM adapted for Gazebo simulation
+- [px4_msgs](https://github.com/PX4/px4_msgs) - PX4 message definitions
+- [PX4-Autopilot](https://github.com/PX4/PX4-Autopilot) - PX4 SITL firmware
+
+**System dependencies:**
 ```bash
-# for MARSIM example
-sudo apt-get install libglfw3-dev libglew-dev libncurses5-dev libncursesw5-dev
-# Eigen [version testd: 3.3.7-2] and soft link 
-sudo apt-get install libeigen3-dev       
+# Eigen and soft link
+sudo apt-get install libeigen3-dev
 sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
 # dw for backward cpp
 sudo apt-get install libdw-dev
-# for ROS dependency
-sudo apt-get install ros-${YOUR-ROS-VERSION}-mavros* ros-${YOUR-ROS-VERSION}-pcl* ros-${YOUR-ROS-VERSION}-rosfmt
+# ROS2 dependencies
+sudo apt-get install ros-jazzy-pcl-ros ros-jazzy-tf2-ros
 ```
 
-Before building the code, select the appropriate ROS version:
+**Tested environment:** Ubuntu 24.04 + ROS2 Jazzy + Gazebo Harmonic + PX4 v1.15
+
+## 2.2 Installation
 
 ```bash
-# Use ROS1-noetic
-bash ${PATH-TO-SUPER}/SUPER/scripts/select_ros_version.sh ROS1
-# Use ROS2
-bash ${PATH-TO-SUPER}/SUPER/scripts/select_ros_version.sh ROS2
+# Build SUPER + px4_super_bridge
+mkdir -p ~/super_ws/src && cd ~/super_ws/src
+git clone <this-repo> SUPER
+git clone <bridge-repo> px4_super_bridge
+
+cd ~/super_ws
+source /opt/ros/jazzy/setup.bash
+source ~/ros2_ws/install/setup.bash  # for px4_msgs
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-Tested Environments:
+## 2.3 Running the Full Stack
 
-* Ubuntu 20.04 + ROS1 Noetic
-* Ubuntu 20.04 + ROS2 foxy
-* ...
-
-Currently, **ROS1 Noetic** serves as the **Tier 1** supported platform for SUPER. The ROS2 version is still under development and may be unstable, with some issues such as imperfect visualization. We are actively working on improvements.
-
-### Known Build issues
-
-* ...
-
-## 2.2  ROS1 (Noetic) Installation
-```bash
-mkdir -p super_ws/src && cd super_ws/src
-git clone https://github.com/hku-mars/SUPER.git
-cd ..
-catkin_make -DBUILD_TYPE=Release
-```
-
-To test, use one of the following commands:
-
-1. **High-Speed Navigation**
+Launch each component in separate terminals:
 
 ```bash
-cd ${PATH-TO-WS}
-source devel/setup.bash
-roslaunch mission_planner benchmark_high_speed.launch
+# Terminal 1: PX4 SITL + Gazebo
+cd ~/ros2_ws && source install/setup.bash
+ros2 launch px4_offboard_sim sim.launch.py world:=obstacle_course joy:=false
+
+# Terminal 2: FAST-LIO SLAM
+cd ~/ros2_ws && source install/setup.bash
+ros2 launch fast_lio_ros2 slam_simulation.launch.py rviz:=true
+
+# Terminal 3: Arm and take off
+source ~/ros2_ws/install/setup.bash
+ros2 topic pub --once /px4_offboard_sim/offboard_control/arm std_msgs/msg/Bool "{data: true}"
+
+# Terminal 4: SUPER planner + bridge
+cd ~/super_ws
+source /opt/ros/jazzy/setup.bash && source ~/ros2_ws/install/setup.bash && source install/setup.bash
+ros2 launch super_planner full_integration_test.launch.py launch_bridge:=true
+
+# Terminal 5: Send goal (in camera_init / world frame)
+ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped \
+  "{header: {frame_id: 'world'}, pose: {position: {x: 5.0, y: 0.0, z: 3.0}, orientation: {w: 1.0}}}"
 ```
 
-2. **Agile Flight in Dense Environments**
+The drone will autonomously plan and fly to the goal, then hold position once reached.
 
-```bash
-cd ${PATH-TO-WS}
-source devel/setup.bash
-roslaunch mission_planner benchmark_dense.launch
-```
+## 2.4 Configuration
 
-3. **Click and Go Demo**
+SUPER loads its configuration from **`super_planner/config/click.yaml`** using a custom YAML loader (NOT ROS2 parameters). Key settings:
 
-```
-roslaunch mission_planner click_demo.launch 
-```
-In the click demo, press `G` to enable the `2D Goal Pose` plugin, then click a position in RViz to set the goal.
-## 2.3 ROS2
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `cloud_topic` | `/fast_lio_ros2/cloud_registered` | FAST-LIO point cloud topic |
+| `odom_topic` | `/fast_lio_ros2/Odometry` | FAST-LIO odometry topic |
+| `frame_id` | `world` | Map frame (matches FAST-LIO output) |
+| `click_height` | `-10.0` | Disabled (uses goal z directly) |
+| `max_vel` | `1.0` | Max velocity (m/s) |
+| `max_acc` | `2.0` | Max acceleration (m/s^2) |
+| `virtual_ground_height` | `-5.0` | Virtual ground (accommodates camera_init frame) |
 
+## 2.5 Architecture Notes
 
-```bash
-mkdir -p super_ws/src && cd super_ws/src
-git clone https://github.com/hku-mars/SUPER.git
-cd ..
-colcon build --symlink-install
-# add to debug:  --event-handlers console_direct+ 
-```
+- **Coordinate frames**: SUPER operates in ENU (camera_init frame from FAST-LIO). The `px4_super_bridge` converts PositionCommand (ENU) to PoseStamped, and `offboard_control_node` converts ENU to NED for PX4.
+- **Frame calibration**: On the first planner command, `offboard_control_node` calibrates the offset between FAST-LIO's camera_init frame and PX4's NED frame.
+- **Goal reached detection**: When the drone is within 0.5m of the planner setpoint for 3 seconds, it switches to position hold. A new goal >1m away re-activates trajectory tracking.
+- **SUPER config loading**: Uses a custom `YamlLoader` that reads YAML files directly. Edit `click.yaml` for configuration changes -- ROS2 parameter files are NOT used by SUPER's internal loader.
 
-To test, run:
-
-1. **High-speed Navigation**
-
-```bash
-cd ${PATH-TO-WS}
-source install/local_setup.bash
-ros2 launch mission_planner benchmark_high_speed.launch.py
-```
-
-2. **Agile flights in dense enviroment**
-
-```bash
-cd ${PATH-TO-WS}
-source install/local_setup.bash
-ros2 launch mission_planner benchmark_dense.launch.py     
-```
-
-3. **Click demo**
-
-```
-ros2 launch mission_planner click_demo.launch.py
-```
-
-### Real-world deployment
-
-A detailed guide for deploying SUPER on real-world hardware will be available soon. In the meantime, you can refer to [issue #5](https://github.com/hku-mars/SUPER/issues/5) for some helpful hints.
-
-## 2.4 Use Your Own Map
-
-SUPER allows users to load their own **.pcd** maps as simulation environments. To do so:
-
-1. Place your **.pcd** file in:
-   **[./mars_uav_sim/perfect_drone_sim/pcd/](./mars_uav_sim/perfect_drone_sim/pcd)**
-2. Modify the `pcd_name` parameter in the corresponding YAML file located at:
-   **[./mars_uav_sim/perfect_drone_sim/config](./mars_uav_sim/perfect_drone_sim/config)**
-
-This enables seamless integration of custom maps for simulation. 
-
-## 2.5 Logging System
+## 2.6 Logging System
 
 SUPER includes a built-in logging system that records each run automatically. Logs are saved in:
 
@@ -246,11 +231,11 @@ For advanced usage, refer to:
 
 We are actively working on improving the logging system, and updates will be available soon! 
 
-## 2.6 Tuning
+## 2.7 Tuning
 
 To maximize performance, parameter tuning is crucial. The current version of SUPER has a large number of parameters (maybe TOOOO MUCH), requiring careful adjustment. Users can refer to the provided examples for guidance. We plan to provide detailed tuning instructions soon. In the meantime, feedback and issue reports are welcome.
 
-## 2.7 Notable Known Issues
+## 2.8 Notable Known Issues
 * [#10]: When using SUPER with your own simulator (e.g., Gazebo) or a LiDAR odometry system other than FAST-LIO2, ensure that the input point cloud is provided in the world frame. ROG-Map does not utilize `frame_id` or `/tf` information and assumes by default that all input point clouds are in the world frame rather than the body frame.
 
 # 3 TODO
@@ -273,7 +258,8 @@ SUPER is built upon several outstanding open-source projects. We extend our grat
 
 * **[FAST_LIO](https://github.com/hku-mars/FAST_LIO)**, **[Swarm-LIO2](https://github.com/hku-mars/Swarm-LIO2)** and  **[LiDAR_IMU_Init](https://github.com/hku-mars/LiDAR_IMU_Init)**  for their excellent localization solutions.
 * **[ROG-Map](https://github.com/hku-mars/ROG-Map)** - A high-performance mapping framework that influenced our approach to map representation and optimization.
-* **[MARSIM](https://github.com/hku-mars/MARSIM)** - A simulation environment that played a key role in testing and evaluating our algorithms in virtual scenarios.
+* **[MARSIM](https://github.com/hku-mars/MARSIM)** - The original simulation environment used for testing SUPER (replaced by Gazebo Sim in this adaptation).
+* **[PX4-Autopilot](https://github.com/PX4/PX4-Autopilot)** - Open-source flight control software used for SITL simulation.
 * **[GCOPTER](https://github.com/ZJU-FAST-Lab/GCOPTER)** – A valuable resource that efficiently performs differentiable trajectory optimization and serves as the foundation of our trajectory optimization method.
 
   **[FIRI](https://github.com/ZJU-FAST-Lab/GCOPTER/blob/main/gcopter/include/gcopter/firi.hpp)** – An extremely efficient safe flight corridor generation method upon which our CIRI is built.

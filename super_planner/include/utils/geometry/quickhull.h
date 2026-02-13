@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <cassert>
+#include <cstdint>
 
 namespace geometry_utils {
 

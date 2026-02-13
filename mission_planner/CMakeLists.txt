@@ -30,7 +30,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(mavros_msgs REQUIRED)
+# mavros_msgs removed - not needed for Gazebo simulation
 
 # Other packages
 find_package(Eigen3 REQUIRED)
@@ -53,7 +53,6 @@ set(THIRD_PARTY
 
 set(dependencies
         rclcpp
-        mavros_msgs
         sensor_msgs
         std_msgs
         geometry_msgs

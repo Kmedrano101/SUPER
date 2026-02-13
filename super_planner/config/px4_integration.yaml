@@ -168,8 +168,8 @@
       # ROS Topic Interface - CRITICAL CONFIGURATION
       ros_callback:
         ros_callback_en: true                      # ✅ Enable ROS topic subscriptions
-        cloud_topic: "/cloud_registered"           # ✅ FAST-LIO output
-        odom_topic: "/Odometry"                    # ✅ FAST-LIO output
+        cloud_topic: "/fast_lio_ros2/cloud_registered"  # FAST-LIO namespaced output
+        odom_topic: "/fast_lio_ros2/Odometry"          # FAST-LIO namespaced output
         odom_timeout: 2.0                          # Timeout for odometry loss (s)
     
       # Visualization settings
@@ -207,10 +207,10 @@
     # ✅ = Already matches your system topics
     #
     # Your current topics:
-    #   FAST-LIO outputs:
-    #     /Odometry              → ROG-Map odom input
-    #     /cloud_registered      → ROG-Map cloud input
-    #     /path                  → Visualization
+    #   FAST-LIO outputs (namespaced):
+    #     /fast_lio_ros2/Odometry              → ROG-Map odom input
+    #     /fast_lio_ros2/cloud_registered      → ROG-Map cloud input
+    #     /fast_lio_ros2/path                  → Visualization
     #
     #   SUPER outputs:
     #     /planning/pos_cmd      → px4_super_bridge input

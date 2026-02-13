@@ -7,7 +7,7 @@ fsm:
   # Goal input - Use RViz 2D Goal Pose or custom goal publisher
   click_goal_en: true
   click_goal_topic: "/goal_pose"              # 🔧 Changed to match RViz default
-  click_height: 1.5                            # Default Z height for clicked goals
+  click_height: -10.0                           # Disabled (-10 < -5 = use goal's z directly)
   click_yaw_en: true
 
   # Replanning rate - Conservative for PX4 integration
@@ -65,9 +65,9 @@ traj_opt:
 
   # Dynamic constraints - CRITICAL FOR PX4 INTEGRATION
   boundary:
-    max_vel: 5.0                               # 🔧 REDUCED from 25 m/s for safety
-    max_acc: 5.0                               # 🔧 REDUCED from 20 m/s²
-    max_jerk: 30.0                             # 🔧 REDUCED from 120 m/s³
+    max_vel: 1.0                               # 🔧 Slow testing (1 m/s max)
+    max_acc: 2.0                               # 🔧 Conservative acceleration
+    max_jerk: 10.0                             # 🔧 Smooth jerk limit
     max_omg: 3.0                               # 🔧 REDUCED angular velocity (rad/s)
     max_acc_thr: 15.0                          # 🔧 REDUCED thrust acceleration
     min_acc_thr: 6.0
@@ -146,7 +146,7 @@ rog_map:
 
   # Virtual boundaries
   virtual_ceil_height: 5.0                     # Virtual ceiling (m)
-  virtual_ground_height: -0.5                  # Virtual floor (m)
+  virtual_ground_height: -5.0                  # Virtual floor (m) - low since camera_init is at hover altitude
 
   load_pcd_en: false                           # Don't load static PCD
 
@@ -164,8 +164,8 @@ rog_map:
   # ROS Topic Interface - CRITICAL CONFIGURATION
   ros_callback:
     enable: true                               # ✅ Enable ROS topic subscriptions
-    cloud_topic: "/cloud_registered"           # ✅ FAST-LIO output
-    odom_topic: "/Odometry"                    # ✅ FAST-LIO output
+    cloud_topic: "/fast_lio_ros2/cloud_registered"  # FAST-LIO namespaced output
+    odom_topic: "/fast_lio_ros2/Odometry"          # FAST-LIO namespaced output
     odom_timeout: 2.0                          # Timeout for odometry loss (s)
 
   # Visualization settings
@@ -175,7 +175,7 @@ rog_map:
     time_rate: 2                               # Visualization update rate (Hz)
     frame_rate: 0
     range: [50, 50, 10]                        # 🔧 Visualization range [x, y, z] (m) - Increased
-    frame_id: "camera_init"                    # 🔧 FAST-LIO world frame
+    frame_id: "world"                           # World frame (matches FAST-LIO config)
     pub_unknown_map_en: false
 
   # Point cloud filtering

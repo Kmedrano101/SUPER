@@ -1,5 +1,6 @@
 goal_pub_topic: "/planning/click_goal"
-odom_topic: "/lidar_slam/odom"
+odom_topic: "/fast_lio_ros2/Odometry"
+# odom_topic: "/lidar_slam/odom"
 # odom_topic: "/mavros/local_position/odom"
 # 0 for RVIZ and; 1 for Mavros; 2 for constant time
 start_trigger_type: 2

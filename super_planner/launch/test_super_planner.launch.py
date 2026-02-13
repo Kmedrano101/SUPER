@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 
 """
-Test Launch File for SUPER Planner Integration
-Tests SUPER with FAST-LIO and PX4 system
+Standalone SUPER Planner Launch File
+Launches only the fsm_node for testing with FAST-LIO + PX4.
+
+Prerequisites (launched separately):
+  1. PX4 SITL + Gazebo:  ros2 launch px4_offboard_sim sim.launch.py
+  2. FAST-LIO SLAM:      ros2 launch fast_lio_ros2 slam_simulation.launch.py
+
+Usage:
+  ros2 launch super_planner test_super_planner.launch.py
+  ros2 launch super_planner test_super_planner.launch.py config_file:=/path/to/config.yaml
 
 Author: Kevin Medrano Ayala
 Date: 2025
@@ -11,21 +19,19 @@ Date: 2025
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # Get package directory
     super_planner_dir = get_package_share_directory('super_planner')
 
-    # Default configuration file (installed location)
     default_config_file = os.path.join(
         super_planner_dir, 'config', 'px4_integration.yaml'
     )
 
-    # Declare launch arguments
     config_file_arg = DeclareLaunchArgument(
         'config_file',
         default_value=default_config_file,
@@ -34,14 +40,14 @@ def generate_launch_description():
 
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='true',
+        default_value='false',
         description='Use simulation (Gazebo) clock if true'
     )
 
     rviz_arg = DeclareLaunchArgument(
         'rviz',
-        default_value='true',
-        description='Launch RViz for visualization'
+        default_value='false',
+        description='Launch RViz for SUPER visualization'
     )
 
     # SUPER FSM Node
@@ -54,27 +60,15 @@ def generate_launch_description():
             LaunchConfiguration('config_file'),
             {'use_sim_time': LaunchConfiguration('use_sim_time')}
         ],
-        # Topic remappings (if needed)
-        remappings=[
-            # Uncomment if your odometry topic name is different
-            # ('/Odometry', '/your_odom_topic'),
-        ],
         emulate_tty=True,
-        prefix='bash -c "sleep 2; $0 $@"'  # Wait 2s for other nodes to start
     )
 
-    # RViz Node (optional) - Using super_integration.rviz (fixed for ROS2)
-    rviz_config_file = os.path.join(
-        super_planner_dir, 'rviz', 'super_integration.rviz'
-    )
-
-    # Create a proper launch condition
-    from launch.conditions import IfCondition
-
+    # RViz Node (optional)
+    rviz_config_file = os.path.join(super_planner_dir, 'rviz', 'super_integration.rviz')
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
-        name='rviz2',
+        name='rviz2_super',
         arguments=['-d', rviz_config_file] if os.path.exists(rviz_config_file) else [],
         output='screen',
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
