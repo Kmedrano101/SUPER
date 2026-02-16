@@ -1,0 +1,31 @@
+px4_mpc_controller:
+  ros__parameters:
+    # Control loop rate (Hz)
+    mpc_rate: 50.0
+
+    # Velocity and acceleration limits (from SUPER click.yaml)
+    max_vel: 1.0
+    max_acc: 2.0
+
+    # Yaw P controller gain
+    yaw_kp: 2.0
+
+    # MPC cost weights
+    Q_pos: 50.0    # Position tracking weight
+    Q_vel: 10.0    # Velocity tracking weight
+    R_acc: 1.0     # Acceleration smoothness weight
+
+    # Planner timeout (seconds) - switch to hold if no trajectory update
+    planner_timeout: 3.0
+
+    # Goal reached threshold (meters)
+    goal_threshold: 0.5
+
+    # Goal hold time (seconds) before declaring goal reached
+    goal_hold_time: 3.0
+
+    # Topic configuration
+    topics:
+      poly_traj: "/planning_cmd/poly_traj"
+      vehicle_local_position: "/fmu/out/vehicle_local_position_v1"
+      mpc_setpoint: "/px4_offboard_sim/offboard_control/mpc_setpoint"
