@@ -94,6 +94,7 @@ namespace rog_map {
                                                   odom_msg->pose.pose.orientation.z)));
 
 
+            if (!cfg_.publish_tf) return;
             geometry_msgs::msg::TransformStamped transformStamped;
             transformStamped.header.stamp = nh_->get_clock()->now();
             transformStamped.header.frame_id = odom_msg->header.frame_id;  // Use odometry parent frame (world)
@@ -157,7 +158,14 @@ namespace rog_map {
             rc_.unfinished_frame_cnt = 0;
             rc_.updete_lock.unlock();
 
-            updateProbMap(temp_pc, temp_pose);
+            // Never let a map-update exception terminate the node: drop this scan.
+            try {
+                updateProbMap(temp_pc, temp_pose);
+            } catch (const std::exception &e) {
+                std::cout << RED << " -- [ROG ERROR] map update threw, scan dropped: " << e.what() << RESET
+                          << std::endl;
+                return;
+            }
 
             writeTimeConsumingToLog(time_log_file_);
         }

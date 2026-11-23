@@ -78,6 +78,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 )
 
 
+# Standalone map server (rog_map/occ for planners other than SUPER)
+add_executable(rog_map_node Apps/rog_map_node.cpp)
+target_link_libraries(rog_map_node ${PROJECT_NAME})
+install(TARGETS rog_map_node DESTINATION lib/${PROJECT_NAME})
+
 install(TARGETS
         ${PROJECT_NAME}
         ARCHIVE DESTINATION lib

@@ -117,6 +117,8 @@ namespace rog_map {
             loader.LoadParam(name_space + "/ros_callback/cloud_topic", cloud_topic, string("/cloud_registered"));
             loader.LoadParam(name_space + "/ros_callback/odom_topic", odom_topic, string("/lidar_slam/odom"));
             loader.LoadParam(name_space + "/ros_callback/odom_timeout", odom_timeout, 0.05);
+            // false when the odometry source already publishes this TF (e.g. NEXUS map -> body)
+            loader.LoadParam(name_space + "/ros_callback/publish_tf", publish_tf, true);
 
 
             loader.LoadParam(name_space + "/visualization/enable", visualization_en, false);
@@ -339,6 +341,7 @@ namespace rog_map {
 
 
         double odom_timeout{};
+        bool publish_tf{true};
         Vec3f visualization_range{};
         double viz_time_rate{};
         int viz_frame_rate{};
