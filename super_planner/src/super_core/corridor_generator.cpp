@@ -110,7 +110,10 @@ namespace super_planner {
             if ((path[first_id] - path[second_id]).norm() > seed_line_max_length_ * 1.5) {
                 fmt::print("first: {}\n second: {}\n seed line max: {}\n", path[first_id].transpose(),
                            path[second_id].transpose(), seed_line_max_length_);
-                throw std::runtime_error("seed line too long");
+                // A guide-path segment longer than the seed limit cannot be covered by
+                // one polytope: report a corridor failure (the planner retries) instead of
+                // throwing, which used to abort fsm_node in flight.
+                cout << YELLOW << " -- [SUPER] Seed line too long, corridor generation failed." << RESET << endl;
                 return false;
             }
             if (!GeneratePolytopeFromLine(seed_lines.back(), temp_poly)) {

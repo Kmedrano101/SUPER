@@ -81,7 +81,7 @@ namespace fsm {
         planner_ptr_->getModuleTimeConsuming(log_module_time);
         log_module_time[log_module_time.size() - 2] = replan_once_time.stop();
         // save on log
-        replan_logs_.push_back(planner_ptr_->getLatestReplanLog());
+        pushReplanLog();
         WriteTimeToLog();
     }
 
@@ -159,7 +159,7 @@ namespace fsm {
                     cout << YELLOW << " -- [Fsm] PlanFromRest failed, try replan." << RESET << endl;
                     // Don't change state - stay in GENERATE_TRAJ to retry
                 }
-                replan_logs_.push_back(planner_ptr_->getLatestReplanLog());
+                pushReplanLog();
                 break;
             }
             case FOLLOW_TRAJ: {

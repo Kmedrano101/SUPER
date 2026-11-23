@@ -115,7 +115,7 @@ namespace fsm {
             }
 
             // save on log
-            replan_logs_.push_back(planner_ptr_->getLatestReplanLog());
+            pushReplanLog();
             fmt::print(fmt::fg(fmt::color::green), " -- Replan ID: {}, ret code: {}\n",
                        replan_logs_.size() - 1, replan_logs_.back().getRetCode());
         }
@@ -144,6 +144,17 @@ namespace fsm {
 
     protected:
         vector<LogOneReplan> replan_logs_;
+
+        // Every log holds point clouds, polytopes and trajectories and one is
+        // stored per replan (10 Hz) and per plan-from-rest retry (100 Hz): unbounded,
+        // this grew to several GB in a few minutes. Keep only the newest ones.
+        void pushReplanLog() {
+            replan_logs_.push_back(planner_ptr_->getLatestReplanLog());
+            const size_t cap = static_cast<size_t>(std::max(cfg_.replan_log_max, 0));
+            if (cap > 0 && replan_logs_.size() > 2 * cap) {
+                replan_logs_.erase(replan_logs_.begin(), replan_logs_.end() - cap);
+            }
+        }
         /* Callback functions */
         bool finish_plan = false;
         double system_start_time_;

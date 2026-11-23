@@ -84,7 +84,10 @@ int main(int argc, char** argv) {
     std::string cfg_path = "click.yaml";
     node->declare_parameter("config_name", cfg_path);
     node->get_parameter("config_name", cfg_path);
-    cfg_path = CONFIG_FILE_DIR(cfg_path);
+    // An absolute path is used as is; a relative name is looked up in super_planner/config.
+    if (cfg_path.empty() || cfg_path[0] != '/') {
+        cfg_path = CONFIG_FILE_DIR(cfg_path);
+    }
     fsm_ptr->init(node,cfg_path);
 
     // 打印启动信息（ROS2风格）

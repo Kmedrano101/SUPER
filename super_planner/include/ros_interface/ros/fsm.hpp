@@ -57,6 +57,14 @@ namespace fsm {
         nav_msgs::msg::Path path;
 
         vector<super_planner::msg::PositionCommand> cmd_logs_;
+        // 100 Hz commands kept for the shutdown dump: newest ~5 min only.
+        void pushCmdLog(const super_planner::msg::PositionCommand &cmd) {
+            constexpr size_t kCap = 30000;
+            cmd_logs_.push_back(cmd);
+            if (cmd_logs_.size() > 2 * kCap) {
+                cmd_logs_.erase(cmd_logs_.begin(), cmd_logs_.end() - kCap);
+            }
+        }
 
         void resetVisualizedPath() override {
             path.poses.clear();
@@ -174,7 +182,7 @@ namespace fsm {
             pos_cmd.angular_velocity.z = omg(2);
             pos_cmd.thrust.z = aT;
             latest_cmd = pos_cmd;
-            cmd_logs_.push_back(latest_cmd);
+            pushCmdLog(latest_cmd);
         }
 
     public:
@@ -270,7 +278,7 @@ namespace fsm {
             }
             fmt::print(" -- [Fsm] Cur vel: {}, delta_v: {}, max_delta_v: {}\n", pid_cmd_.vel_norm, delta_v,
                        max_delta_v);
-            cmd_logs_.push_back(latest_cmd);
+            pushCmdLog(latest_cmd);
             return true;
         }
 
@@ -395,12 +403,23 @@ namespace fsm {
             }
         }
 
+        // Timer callbacks never let an exception escape: an uncaught exception in a
+        // planning step would terminate the node and leave the vehicle without
+        // commands. A failed step is logged and retried on the next tick.
         void replanTimerCallback() {
-            callReplanOnce();
+            try {
+                callReplanOnce();
+            } catch (const std::exception &e) {
+                RCLCPP_ERROR(nh_->get_logger(), " -- [Fsm] replan step threw: %s", e.what());
+            }
         }
 
         void mainFsmTimerCallback() {
-            callMainFsmOnce();
+            try {
+                callMainFsmOnce();
+            } catch (const std::exception &e) {
+                RCLCPP_ERROR(nh_->get_logger(), " -- [Fsm] main FSM step threw: %s", e.what());
+            }
         }
 
     };
