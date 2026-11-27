@@ -52,6 +52,8 @@ namespace super_planner {
             return "No odom, return at the start of the replan";
         case SUPER_NO_START_POINT:
             return "Cannot find a start point in the local map";
+        default:
+            return "Unknown return code";
         }
     };
 }
